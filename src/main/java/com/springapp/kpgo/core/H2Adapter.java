@@ -5,12 +5,12 @@
  */
 package com.springapp.kpgo.core;
 
-import java.lang.reflect.Constructor;
-import java.sql.*;
-import javax.sql.DataSource;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.h2.jdbcx.JdbcDataSource;
+//import java.lang.reflect.Constructor;
+//import java.sql.*;
+//import javax.sql.DataSource;
+//import org.springframework.beans.factory.annotation.Autowired;
+//import org.springframework.jdbc.core.JdbcTemplate;
+//import org.h2.jdbcx.JdbcDataSource;
 
 /**
  *
@@ -18,22 +18,22 @@ import org.h2.jdbcx.JdbcDataSource;
  */
 public class H2Adapter {
     
-    public JdbcTemplate jdbct;
+//    public JdbcTemplate jdbct;
     
     public H2Adapter() {
-        try {
-            // Class dsClass = Class.forName("org.h2.jdbcx.JdbcDataSource");
-            // Constructor dsConstructor = dsClass.getDeclaredConstructor();
-            // jdbct = new JdbcTemplate((DataSource)dsConstructor.newInstance());
-            JdbcDataSource ds = new JdbcdataSource();
-            jdbct = new JdbcTemplate(JdbcDataSource);
-        } catch (Exception err) {
-            throw new Error(err);
-        }
+//        try {
+//             Class dsClass = Class.forName("org.h2.jdbcx.JdbcDataSource");
+//             Constructor dsConstructor = dsClass.getDeclaredConstructor();
+//             jdbct = new JdbcTemplate((DataSource)dsConstructor.newInstance());
+//            JdbcDataSource ds = new JdbcdataSource();
+//            jdbct = new JdbcTemplate(JdbcDataSource);
+//        } catch (Exception err) {
+//            throw new Error(err);
+//        }
     }
     
-    public void test() {
-        jdbct.execute("CREATE TABLE test_table");
-    }
+//    public void test() {
+//        jdbct.execute("CREATE TABLE test_table");
+//    }
     
 }
