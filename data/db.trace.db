@@ -1970,3 +1970,24 @@ DROP USER [42001-200]
 2021-09-15 18:49:54 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "USER" not found; SQL statement:
 select user0_.id as id1_0_, user0_.password as password2_0_, user0_.username as username3_0_ from user user0_ where user0_.username=? [42102-200]
+2021-09-16 20:30:25 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "SELECT * FROM USER DROP 1[*]"; SQL statement:
+SELECT * FROM USER DROP 1 [42000-200]
+2021-09-16 20:30:35 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "DROP 1[*] USER"; expected "TABLE, INDEX, USER, SEQUENCE, CONSTANT, TRIGGER, VIEW, ROLE, ALIAS, SCHEMA, ALL, DOMAIN, TYPE, DATATYPE, AGGREGATE, SYNONYM"; SQL statement:
+DROP 1 USER [42001-200]
+2021-09-16 20:30:38 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "DROP 1[*]"; expected "TABLE, INDEX, USER, SEQUENCE, CONSTANT, TRIGGER, VIEW, ROLE, ALIAS, SCHEMA, ALL, DOMAIN, TYPE, DATATYPE, AGGREGATE, SYNONYM"; SQL statement:
+DROP 1 [42001-200]
+2021-09-16 20:30:59 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "DROP INDEX 1[*]"; expected "identifier"; SQL statement:
+DROP INDEX 1 [42001-200]
+2021-09-16 20:31:10 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "DELETE[*]"; expected "identifier"; SQL statement:
+DELETE [42001-200]
+2021-09-16 20:31:15 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "DELETE USER 1[*]"; SQL statement:
+DELETE USER 1 [42000-200]
+2021-09-16 20:31:20 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "DELETE 1[*]"; expected "identifier"; SQL statement:
+DELETE 1 [42001-200]

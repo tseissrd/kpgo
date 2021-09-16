@@ -12,11 +12,14 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToOne;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.NotEmpty;
+
+import com.springapp.kpgo.models.Password;
 
 /**
  *
@@ -28,7 +31,7 @@ public class User {
     public User() {
     }
     
-    public User(String name, String password) {
+    public User(String name, Password password) {
         this.username = name;
         this.password = password;
     }
@@ -40,12 +43,20 @@ public class User {
     @NotEmpty
     private String username;
     
-    @NotEmpty
-    private String password;
+    @OneToOne
+    private Password password;
     
     @Override
     public String toString() {
         return username + ":***";
+    }
+    
+    public String getUsername() {
+        return this.username;
+    }
+    
+    public Password getPassword() {
+        return this.password;
     }
     
 }
