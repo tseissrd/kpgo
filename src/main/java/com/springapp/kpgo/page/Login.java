@@ -3,7 +3,6 @@ package com.springapp.kpgo.page;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.stereotype.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestHeader;
 import java.util.Map;
 import com.springapp.kpgo.model.*;
 import java.util.Base64;
@@ -49,9 +48,11 @@ public class Login {
                 return "login";
             String username = authParts[0];
             String password = authParts[1];
-            Password pwdObj = new Password(password);
+            Password pwdObj = new Password(username, password);
             System.out.println(pwdObj.digest);
             User user = authMgr.authorize(username, pwdObj);
+            if (user == null)
+                return "login";
             System.out.println(user);
             
             Session session = authMgr.getSession(user);
@@ -64,7 +65,7 @@ public class Login {
     public void test() {
         User myUser = repository.users().findByUsername("TestName");
         if (myUser == null) {
-            Password password = new Password("TestPwd");
+            Password password = new Password("TestName", "TestPwd");
             myUser = new User("TestName", password);
             repository.save(password);
             repository.save(myUser);

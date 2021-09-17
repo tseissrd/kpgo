@@ -18,9 +18,21 @@ div {
 }
 
 .form-fields {
-    width: 165px;
+    width: 170px;
     margin-left: auto;
     margin-right: auto;
+}
+
+.form-fields-with-actions {
+    width: 250px;
+    height: 70px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.field-actions {
+    margin-left: 18px;
+    margin-top: 55px;
 }
 
 .form-field {
@@ -38,8 +50,35 @@ div {
 }
 
 .submit {
+    width: 55.27px;
+    height: 21px;
+    float: left;
+}
+
+.actions {
+    width: 150px;
+    height: 21px;
     margin-top: 16px;
     margin-bottom: 16px;
     margin-left: auto;
     margin-right: auto;
+}
+
+.signup-form {
+    margin-top: 20px;
+}
+
+.show-signup-container {
+    width: 76px;
+    height: 17px;
+    float: left;
+    margin-left: 13px;
+}
+
+#signup-container {
+    display: none;
+}
+
+.float-left {
+    float: left;
 }

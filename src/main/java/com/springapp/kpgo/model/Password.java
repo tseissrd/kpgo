@@ -25,9 +25,11 @@ public class Password {
         this.digest = "";
     }
     
-    public Password(String password) {
+    public Password(String username, String password) {
         try {
-            this.digest = new String(Base64.getEncoder().encode(MessageDigest.getInstance("SHA-256").digest(password.getBytes("UTF-8"))), "UTF-8");
+            MessageDigest digestObj = MessageDigest.getInstance("SHA-256");
+            digestObj.update(username.getBytes("UTF-8"));
+            this.digest = new String(Base64.getEncoder().encode(digestObj.digest(password.getBytes("UTF-8"))), "UTF-8");
         } catch (Exception err) {
             throw new Error(err);
         }

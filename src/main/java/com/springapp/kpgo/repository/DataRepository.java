@@ -56,11 +56,8 @@ public class DataRepository
     
     public <S> S save(S entity) {
         init();
-        System.out.println(userRepository);
         String className = entity.getClass().getCanonicalName();
         JpaRepository repository = repositories.get(className);
-        System.out.println(className);
-        System.out.println(repository);
         if (repository == null) {
             System.err.println("Could not find repository for " + className);
             return null;

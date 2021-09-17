@@ -1991,3 +1991,9 @@ DELETE USER 1 [42000-200]
 2021-09-16 20:31:20 jdbc[13]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "DELETE 1[*]"; expected "identifier"; SQL statement:
 DELETE 1 [42001-200]
+2021-09-17 17:22:26 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "DELETE FROM PASSWORD JOIN[*] SESSION JOIN USER JOIN USER_SESSIONS"; SQL statement:
+delete from password join session join user join user_sessions [42000-200]
+2021-09-17 17:22:41 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "DELETE FROM *[*]"; expected "identifier"; SQL statement:
+delete from * [42001-200]
