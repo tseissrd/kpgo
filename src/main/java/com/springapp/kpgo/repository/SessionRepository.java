@@ -3,19 +3,16 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.springapp.kpgo.repositories;
+package com.springapp.kpgo.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import com.springapp.kpgo.models.User;
+import com.springapp.kpgo.model.Session;
 
 /**
  *
  * @author Sovereign
  */
 @Repository
-public interface UserRepository extends JpaRepository<User, Long> {
-	
-    User findByUsername(String name);
-    
+public interface SessionRepository extends JpaRepository<Session, String> {
 }

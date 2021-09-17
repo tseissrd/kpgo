@@ -1,4 +1,4 @@
-package com.springapp.kpgo.pages;
+package com.springapp.kpgo.page;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.stereotype.Controller;

@@ -3,9 +3,10 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.springapp.kpgo.models;
+package com.springapp.kpgo.model;
 
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -13,13 +14,15 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
+import javax.persistence.OneToMany;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.NotEmpty;
 
-import com.springapp.kpgo.models.Password;
+import com.springapp.kpgo.model.Password;
+import com.springapp.kpgo.model.Session;
 
 /**
  *
@@ -46,9 +49,12 @@ public class User {
     @OneToOne
     private Password password;
     
+    @OneToMany
+    private Set<Session> sessions;
+    
     @Override
     public String toString() {
-        return username + ":***";
+        return this.username + ":***";
     }
     
     public String getUsername() {
@@ -57,6 +63,16 @@ public class User {
     
     public Password getPassword() {
         return this.password;
+    }
+    
+    public Session newSession() {
+        Session session = new Session();
+        this.sessions.add(session);
+        return session;
+    }
+    
+    public boolean checkSession(Session session) {
+        return this.sessions.contains(session);
     }
     
 }

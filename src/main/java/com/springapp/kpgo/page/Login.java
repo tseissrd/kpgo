@@ -1,28 +1,27 @@
-package com.springapp.kpgo.pages;
+package com.springapp.kpgo.page;
 
 import org.springframework.web.bind.annotation.*;
 import org.springframework.stereotype.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestHeader;
 import java.util.Map;
-import com.springapp.kpgo.models.Password;
+import com.springapp.kpgo.model.*;
 import java.util.Base64;
-import com.springapp.kpgo.core.Authorization;
+import com.springapp.kpgo.security.AuthorizationManager;
 
 // import com.springapp.kpgo.core.*;
 
-import com.springapp.kpgo.repositories.UserRepository;
-import com.springapp.kpgo.repositories.PasswordRepository;
-import com.springapp.kpgo.models.User;
+import com.springapp.kpgo.repository.DataRepository;
+import com.springapp.kpgo.model.User;
 
 @Controller
 public class Login {
     
     @Autowired
-    private UserRepository myRepo;
+    private DataRepository repository;
     
     @Autowired
-    private PasswordRepository pwdRepo;
+    private AuthorizationManager authMgr;
     
     @RequestMapping("/login")
     public String login(@RequestHeader Map<String, String> headers) {
@@ -52,20 +51,23 @@ public class Login {
             String password = authParts[1];
             Password pwdObj = new Password(password);
             System.out.println(pwdObj.digest);
-            User user = Authorization.getMgr().authorize(username, pwdObj);
+            User user = authMgr.authorize(username, pwdObj);
             System.out.println(user);
+            
+            Session session = authMgr.getSession(user);
+            System.out.println(session.toString());
             
             return "login";
         }
     }
     
     public void test() {
-        User myUser = myRepo.findByUsername("TestName");
+        User myUser = repository.users().findByUsername("TestName");
         if (myUser == null) {
             Password password = new Password("TestPwd");
             myUser = new User("TestName", password);
-            pwdRepo.save(password);
-            myRepo.save(myUser);
+            repository.save(password);
+            repository.save(myUser);
             System.out.println("created new user");
         }
         System.out.println(myUser);

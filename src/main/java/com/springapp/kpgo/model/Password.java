@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.springapp.kpgo.models;
+package com.springapp.kpgo.model;
 
 import java.util.Base64;
 import java.security.MessageDigest;
@@ -34,10 +34,7 @@ public class Password {
     }
     
     public boolean equals(Password password) {
-        if (password.digest == this.digest)
-            return true;
-        else
-            return false;
+        return password.digest.equals(this.digest);
     }
     
 }
