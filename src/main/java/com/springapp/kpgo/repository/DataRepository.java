@@ -55,18 +55,34 @@ public class DataRepository
     }
     
     public <S> S save(S entity) {
-        init();
-        String className = entity.getClass().getCanonicalName();
-        JpaRepository repository = repositories.get(className);
-        if (repository == null) {
-            System.err.println("Could not find repository for " + className);
-            return null;
-        }
-        return (S)repository.save(entity);
+      init();
+      String className = entity.getClass().getCanonicalName();
+      JpaRepository repository = repositories.get(className);
+      if (repository == null) {
+        System.err.println("Could not find repository for " + className);
+        return null;
+      }
+      return (S)repository.save(entity);
+    }
+    
+    public <S> boolean delete(S entity) {
+      init();
+      String className = entity.getClass().getCanonicalName();
+      JpaRepository repository = repositories.get(className);
+      if (repository == null) {
+        System.err.println("Could not find repository for " + className);
+        return false;
+      }
+      repository.delete(entity);
+      return true;
     }
     
     public UserRepository users() {
         return userRepository;
+    }
+    
+    public SessionRepository sessions() {
+        return sessionRepository;
     }
     
 }

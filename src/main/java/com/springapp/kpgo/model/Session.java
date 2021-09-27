@@ -9,6 +9,7 @@ import java.security.SecureRandom;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import java.util.Base64;
+import java.util.Calendar;
 
 /**
  *
@@ -20,6 +21,8 @@ public class Session {
     @Id
     public final String id;
     
+    public Calendar expires;
+    
     private static final SecureRandom random = new SecureRandom();
     
     public Session() {
@@ -30,6 +33,7 @@ public class Session {
         } catch (Exception err) {
             throw new Error(err);
         }
+        expires = Calendar.getInstance();
     }
     
     public boolean equals(Session session) {

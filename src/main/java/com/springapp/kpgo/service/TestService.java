@@ -1,4 +1,4 @@
-package com.springapp.kpgo.services;
+package com.springapp.kpgo.service;
 
 import org.springframework.web.bind.annotation.*;
 
