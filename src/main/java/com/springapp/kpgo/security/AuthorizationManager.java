@@ -52,6 +52,8 @@ public class AuthorizationManager {
     }
     
     public User authorize(Cookie[] cookies) {
+      if (cookies == null)
+        return null;
       String username = null;
       Session session = null;
       if (cookies.length > 0) {

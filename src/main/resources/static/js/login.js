@@ -8,7 +8,8 @@ submitBtn.addEventListener('click', async () => {
     }
   });
   const session = await resp.text();
-  console.log(session);
+  if (session && session.length > 0)
+    window.location.href = "/";
 });
 
 const showSignupBtn = document.getElementById('show-signup-button');
@@ -54,4 +55,7 @@ signupBtn.addEventListener('click', async () => {
   });
 
   password.value = passwordReenter.value = '';
+  console.log(response);
+  if (response.status === 200)
+    showSignupBtn.dispatchEvent(new Event('click'));
 });

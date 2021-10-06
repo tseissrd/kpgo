@@ -61,6 +61,11 @@ public class LoginService {
       System.out.println(session.toString());
 
       response.setStatus(HttpStatus.OK.value());
+//      try {
+//        response.sendRedirect("/");
+//      } catch (Exception err) {
+//        throw new Error(err);
+//      }
       Cookie sessionCookie = new Cookie("session", user.getUsername() + "#" + session.toString());
       sessionCookie.setPath("/");
       sessionCookie.setMaxAge(1000*60*60);
