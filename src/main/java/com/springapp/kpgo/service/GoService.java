@@ -62,17 +62,27 @@ public class GoService {
       }
       Resource<Game> gameResource;
       
-    //~~~~
+    //~~~~ TESTING
       try {
         resMgr.getResource(1L);
       } catch (NoSuchElementException err) {
-        Player human = new HumanPlayer(user);
-        Player computer = new ComputerPlayer();
-        Game newTestGame = new Game(human, computer, 9, 9);
+//        Player human = new HumanPlayer(user);
+//        Player computer = new ComputerPlayer();
+//        Game newTestGame = new Game(human, computer, 9, 9);
+//        Resource<Game> testGameResource = new Resource<>();
+//        testGameResource = resMgr.writeContent(testGameResource, newTestGame);
+//        System.out.println("created new game: " + testGameResource.getId());
+//        resMgr.giveAccess(testGameResource, user);
+        
+        Player human1 = new HumanPlayer(user);
+        User user2 = authMgr._getAnyUser("player2");
+        Player human2 = new HumanPlayer(user2);
+        Game newTestGame = new Game(human1, human2, 9, 9);
         Resource<Game> testGameResource = new Resource<>();
         testGameResource = resMgr.writeContent(testGameResource, newTestGame);
         System.out.println("created new game: " + testGameResource.getId());
         resMgr.giveAccess(testGameResource, user);
+        resMgr.giveAccess(testGameResource, user2);
       }
     //~~~~
       
@@ -91,9 +101,9 @@ public class GoService {
       
       Game game = gameResource.getContent().read();
       
-      List<Map<String, String>> playersInfo = new ArrayList<>(2);
+      List<Map<String, Object>> playersInfo = new ArrayList<>(2);
       for (Player player: game.getPlayers()) {
-        Map<String, String> playerInfo = new HashMap<>();
+        Map<String, Object> playerInfo = new HashMap<>();
         playerInfo.put("username", player.getName());
         playerInfo.put("colour", player.getBowl().colour.toString());
         playersInfo.add(playerInfo);
@@ -102,6 +112,7 @@ public class GoService {
         
       List<List<String>> jsonView = game.getTable().jsonView();
       respBody.put("table", jsonView);
+      respBody.put("act", game.playerToAct().is(user));
       respBody.put("status", true);
       
       return respBody;
@@ -182,11 +193,12 @@ public class GoService {
         }
       }
       
-      if (player != null) {
+      if ((player != null) && (game.playerToAct() == player)) {
         if (actionType.equals("place_stone")) {
           System.out.println("x: " + pointParam.get(0));
           System.out.println("y: " + pointParam.get(1));
           player.takeTurn(game.getTable().getPoint(pointParam.get(0), pointParam.get(1)));
+          game.nextMove();
           resMgr.writeContent(gameResource, game);
           respBody.put("status", true);
           return respBody;

@@ -106,4 +106,14 @@ public class AuthorizationManager {
       return repository.delete(session);
     }
     
+    //-------- TESTING
+    public User _getAnyUser(String username) {
+      User user = getUser(username);
+      if (user != null) {
+          return user;
+      } else
+          throw new Error("no such user");
+    }
+    //~~~~~~~~
+    
 }

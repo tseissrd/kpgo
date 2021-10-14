@@ -22,6 +22,7 @@ implements Runnable, Serializable
   private final Table table;
   private boolean ended;
   private Player winner;
+  private Player actsNext;
   
   protected Game() {
     players = null;
@@ -37,6 +38,7 @@ implements Runnable, Serializable
     int whiteBowlPlayerNumber = new Random(Calendar.getInstance().toInstant().getEpochSecond()).nextInt(2);
     players[whiteBowlPlayerNumber].assignBowl(new Bowl(Colour.WHITE));
     players[1 - whiteBowlPlayerNumber].assignBowl(new Bowl(Colour.BLACK));
+    actsNext = players[whiteBowlPlayerNumber];
     winner = null;
     ended = false;
   }
@@ -47,6 +49,17 @@ implements Runnable, Serializable
   
   public Table getTable() {
     return table;
+  }
+  
+  public Player playerToAct() {
+    return actsNext;
+  }
+  
+  public void nextMove() {
+    if (actsNext == players[0])
+      actsNext = players[1];
+    else
+      actsNext = players[0];
   }
 
   @Override

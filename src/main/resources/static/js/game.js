@@ -1,6 +1,15 @@
 const gameTableDock = document.getElementById('go-container');
+
 const gameId = 1;
-updateGameTable(1);
+let actsNext = false;
+updateGameTable();
+
+const heartbeatTimer = setInterval(heartbeat, 2000);
+
+async function heartbeat() {
+  if (!actsNext)
+    updateGameTable();
+}
 
 function constructGameTable(tableObject) {
   const tableEl = document.createElement('table');
@@ -43,6 +52,7 @@ function constructGameTable(tableObject) {
 
 async function updateGameTable() {
   const state = await getState();
+  actsNext = state.act;
   const tableObject = state.table;
   while (gameTableDock.childNodes.length > 0)
     gameTableDock.removeChild(gameTableDock.firstChild);
@@ -66,22 +76,24 @@ async function getState() {
 }
  
 async function act(action, params) { 
-  const res = await fetch('/go/act', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      game_id: gameId,
-      action: {
-        type: action,
-//        params: {
-//          point: [3, 5]
-//        }
-        params
-      }
-    })
-  });
-  
-  return await res.json();
+  if (actsNext) {
+    const res = await fetch('/go/act', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        game_id: gameId,
+        action: {
+          type: action,
+  //        params: {
+  //          point: [3, 5]
+  //        }
+          params
+        }
+      })
+    });
+
+    return await res.json();
+  }
 }
