@@ -5,9 +5,12 @@
  */
 package com.springapp.kpgo.model;
 
+import java.io.Serializable;
 import java.util.Base64;
 import java.security.MessageDigest;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 /**
@@ -16,27 +19,36 @@ import javax.persistence.Id;
  */
 
 @Entity
-public class Password {
+public class Password
+implements Serializable
+{
     
-    @Id
-    public final String digest;
-    
-    public Password() {
-        this.digest = "";
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private long id;
+
+  private final String digest;
+
+  protected Password() {
+    this.digest = "";
+  }
+
+  public Password(String username, String password) {
+    try {
+      MessageDigest digestObj = MessageDigest.getInstance("SHA-256");
+      digestObj.update(username.getBytes("UTF-8"));
+      this.digest = new String(Base64.getEncoder().encode(digestObj.digest(password.getBytes("UTF-8"))), "UTF-8");
+    } catch (Exception err) {
+      throw new Error(err);
     }
-    
-    public Password(String username, String password) {
-        try {
-            MessageDigest digestObj = MessageDigest.getInstance("SHA-256");
-            digestObj.update(username.getBytes("UTF-8"));
-            this.digest = new String(Base64.getEncoder().encode(digestObj.digest(password.getBytes("UTF-8"))), "UTF-8");
-        } catch (Exception err) {
-            throw new Error(err);
-        }
-    }
-    
-    public boolean equals(Password password) {
-        return password.digest.equals(this.digest);
-    }
-    
+  }
+
+  public String getDigest() {
+    return digest;
+  }
+
+  public boolean equals(Password password) {
+      return password.digest.equals(this.getDigest());
+  }
+
 }

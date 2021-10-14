@@ -5,11 +5,15 @@
  */
 package com.springapp.kpgo.go;
 
+import java.io.Serializable;
+
 /**
  *
  * @author Sovereign
  */
-public class TablePoint {
+public class TablePoint
+implements Serializable
+{
   
   public class PointOccupiedError extends Error {};
   

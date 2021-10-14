@@ -5,14 +5,14 @@
  */
 package com.springapp.kpgo.repository;
 
+import com.springapp.kpgo.model.Resource;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import com.springapp.kpgo.model.Password;
 
 /**
  *
  * @author Sovereign
  */
 @Repository
-public interface PasswordRepository extends JpaRepository<Password, Long> {
+public interface ResourceRepository extends JpaRepository<Resource, Long> {
 }

@@ -5,16 +5,24 @@
  */
 package com.springapp.kpgo.go;
 
+import java.io.Serializable;
+
 /**
  *
  * @author Sovereign
  */
-public class Stone {
+public class Stone
+implements Serializable
+{
   
   public final Colour colour;
   
   public Stone(Colour colour) {
     this.colour = colour;
+  }
+  
+  public String toString() {
+    return colour.toString();
   }
   
 }

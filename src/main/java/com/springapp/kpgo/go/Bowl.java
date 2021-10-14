@@ -5,11 +5,15 @@
  */
 package com.springapp.kpgo.go;
 
+import java.io.Serializable;
+
 /**
  *
  * @author Sovereign
  */
-public class Bowl {
+public class Bowl
+implements Serializable
+{
   
   public class NoStonesLeftError extends Error {};
   
@@ -18,6 +22,7 @@ public class Bowl {
   
   public Bowl(Colour colour) {
     this.colour = colour;
+    this.stones = 50;
   }
   
   public int stonesLeft() {

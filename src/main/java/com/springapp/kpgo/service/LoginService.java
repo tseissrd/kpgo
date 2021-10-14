@@ -20,6 +20,14 @@ public class LoginService {
   
   @Autowired
   private AuthorizationManager authMgr;
+  
+  public static void redirectToLogin(HttpServletResponse response) {
+    try {
+      response.sendRedirect("/");
+    } catch (Exception err) {
+      throw new Error(err);
+    }
+  }
 	
   @RequestMapping("/authorize")
   public @ResponseBody String authorize(@RequestHeader Map<String, String> headers, HttpServletResponse response) {
@@ -49,7 +57,7 @@ public class LoginService {
       String username = authParts[0];
       String password = authParts[1];
       Password pwdObj = new Password(username, password);
-      System.out.println(pwdObj.digest);
+      System.out.println(pwdObj.getDigest());
       User user = authMgr.authorize(username, pwdObj);
       if (user == null) {
         response.setStatus(HttpStatus.UNAUTHORIZED.value());

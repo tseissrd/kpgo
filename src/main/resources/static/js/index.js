@@ -1,5 +1,14 @@
 async function testFetch() {
-  console.log(1);
+  await fetch('/go/state', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      game_id: "1"
+    })
+  });
+  
   const res = await fetch('/go/act', {
     method: 'POST',
     headers: {
@@ -15,7 +24,6 @@ async function testFetch() {
       }
     })
   });
-  console.log(2);
 }
 
-testFetch();
+// testFetch();

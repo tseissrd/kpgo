@@ -5,13 +5,18 @@
  */
 package com.springapp.kpgo.go;
 
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  *
  * @author Sovereign
  */
-public class Table {
+public class Table
+implements Serializable
+{
   
   public class SizeExceededError extends Error {};
   
@@ -23,11 +28,13 @@ public class Table {
     this.width = width;
     this.height = height;
     points = new ArrayList<>(width);
+    for (int columnNum = 0; columnNum < width; columnNum += 1)
+      points.add(new ArrayList<>(height));
+    
     points.parallelStream()
       .forEach(column -> {
-        column = new ArrayList<>(height);
-        for (TablePoint point: column) {
-          point = new TablePoint();
+        for (int rowNum = 0; rowNum < height; rowNum += 1) {
+          column.add(new TablePoint());
         }
       });
   }
@@ -36,7 +43,25 @@ public class Table {
     if ((x > width) || (y > height))
       throw new SizeExceededError();
     
-    return points.get(x - 1).get(y - 1);
+    return points.get(x).get(y);
+  }
+  
+  public List<List<String>> jsonView() {
+    List<List<String>> view = new ArrayList<>(height);
+    
+    for (int rowNum = 0; rowNum < height; rowNum += 1) {
+      view.add(new ArrayList<>(width));
+      List<String> row = view.get(rowNum);
+      
+      for (int columnNum = 0; columnNum < width; columnNum += 1) {
+        Stone stone = getPoint(columnNum, rowNum).getStone();
+        if (stone != null)
+          row.add(stone.toString());
+        else
+          row.add("EMPTY");
+      }
+    }
+    return view;
   }
   
 }

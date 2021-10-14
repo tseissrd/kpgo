@@ -11,6 +11,7 @@ import com.springapp.kpgo.repository.*;
 import java.util.HashMap;
 import org.springframework.data.jpa.repository.JpaRepository;
 import com.springapp.kpgo.model.*;
+import java.util.Map;
 
 /**
  *
@@ -30,9 +31,15 @@ public class DataRepository
     @Autowired
     private SessionRepository sessionRepository;
     
+    @Autowired
+    private ResourceRepository resourceRepository;
+    
+    @Autowired
+    private ContentRepository contentRepository;
+    
     private boolean initialized;
     
-    private static final HashMap<String, JpaRepository> repositories = new HashMap<>();
+    private static final Map<String, JpaRepository> repositories = new HashMap<>();
     
     public DataRepository() {
         this.initialized = false;
@@ -47,10 +54,12 @@ public class DataRepository
     
     private void init() {
         if (this.initialized)
-            return;
+          return;
         init(User.class, userRepository);
         init(Password.class, passwordRepository);
         init(Session.class, sessionRepository);
+        init(Resource.class, resourceRepository);
+        init(Content.class, contentRepository);
         this.initialized = true;
     }
     
@@ -78,11 +87,15 @@ public class DataRepository
     }
     
     public UserRepository users() {
-        return userRepository;
+      return userRepository;
     }
     
     public SessionRepository sessions() {
-        return sessionRepository;
+      return sessionRepository;
+    }
+    
+    public ResourceRepository resources() {
+      return resourceRepository;
     }
     
 }

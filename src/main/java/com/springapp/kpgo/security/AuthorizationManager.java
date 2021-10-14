@@ -84,7 +84,7 @@ public class AuthorizationManager {
     
     public Session getSession(User user) {
       Session session = user.newSession();
-      session = repository.save(session);
+      repository.save(session);
       repository.save(user);
       return session;
     }
@@ -93,7 +93,7 @@ public class AuthorizationManager {
       try {
         Calendar expires = Calendar.getInstance();
         expires.add(Calendar.DATE, 1);
-        session.expires = expires;
+        session.setExpiration(expires);
         repository.save(session);
         return true;
       } catch (Exception err) {

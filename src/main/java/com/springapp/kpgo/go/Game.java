@@ -5,12 +5,17 @@
  */
 package com.springapp.kpgo.go;
 
+import java.io.Serializable;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Random;
+
 /**
  *
  * @author Sovereign
  */
 public class Game
-  implements Runnable
+implements Runnable, Serializable
 {
   
   private final Player[] players;
@@ -18,14 +23,30 @@ public class Game
   private boolean ended;
   private Player winner;
   
+  protected Game() {
+    players = null;
+    table = null;
+  }
+  
   public Game(Player player1, Player player2, int tableWidth, int tableHeight) {
     players = new Player[2];
     players[0] = player1;
     players[1] = player2;
     
     table = new Table(tableWidth, tableHeight);
+    int whiteBowlPlayerNumber = new Random(Calendar.getInstance().toInstant().getEpochSecond()).nextInt(2);
+    players[whiteBowlPlayerNumber].assignBowl(new Bowl(Colour.WHITE));
+    players[1 - whiteBowlPlayerNumber].assignBowl(new Bowl(Colour.BLACK));
     winner = null;
     ended = false;
+  }
+  
+  public Player[] getPlayers() {
+    return Arrays.copyOf(players, 2);
+  }
+  
+  public Table getTable() {
+    return table;
   }
 
   @Override

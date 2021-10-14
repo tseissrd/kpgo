@@ -5,21 +5,22 @@
  */
 package com.springapp.kpgo.go;
 
-import java.io.Serializable;
+import com.springapp.kpgo.model.User;
 
 /**
  *
- * @author Sovereign
+ * @author Anna
  */
-public enum Colour
-implements Serializable
-{
+public class ComputerPlayer extends Player {
   
-  BLACK,
-  WHITE;
+  @Override
+  public String getName() {
+    return "Computer player";
+  }
   
-  public String toString() {
-    return this.name();
+  @Override
+  public boolean is(User user) {
+    return false;
   }
   
 }

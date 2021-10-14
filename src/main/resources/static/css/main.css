@@ -9,36 +9,36 @@ and open the template in the editor.
 */
 
 div {
-    position: relative;
+  position: relative;
 }
 
 .login {
-    text-align: center;
-    top: 30%;
+  text-align: center;
+  top: 30%;
 }
 
 .form-fields {
-    width: 170px;
-    margin-left: auto;
-    margin-right: auto;
+  width: 170px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .form-fields-with-actions {
-    width: 250px;
-    height: 70px;
-    margin-left: auto;
-    margin-right: auto;
+  width: 250px;
+  height: 70px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .field-actions {
-    margin-left: 18px;
-    margin-top: 55px;
+  margin-left: 18px;
+  margin-top: 55px;
 }
 
 .form-field {
-    margin-top: 5px;
-    margin-bottom: 5px;
-    text-align: center;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  text-align: center;
 }
 
 .field-label {
@@ -46,39 +46,74 @@ div {
 }
 
 .field-input {
-    text-align: left;
+  text-align: left;
 }
 
 .submit {
-    width: 55.27px;
-    height: 21px;
-    float: left;
+  width: 55.27px;
+  height: 21px;
+  float: left;
 }
 
 .actions {
-    width: 150px;
-    height: 21px;
-    margin-top: 16px;
-    margin-bottom: 16px;
-    margin-left: auto;
-    margin-right: auto;
+  width: 150px;
+  height: 21px;
+  margin-top: 16px;
+  margin-bottom: 16px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .signup-form {
-    margin-top: 20px;
+  margin-top: 20px;
 }
 
 .show-signup-container {
-    width: 76px;
-    height: 17px;
-    float: left;
-    margin-left: 13px;
+  width: 76px;
+  height: 17px;
+  float: left;
+  margin-left: 13px;
 }
 
 #signup-container {
-    display: none;
+  display: none;
 }
 
 .float-left {
-    float: left;
+  float: left;
+}
+
+.go-container {
+  width: 500px;
+  height: 500px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.go-game-table {
+  border-style: solid;
+  border-collapse: collapse;
+}
+
+.go-game-table-point {
+  width: 23px;
+  height: 23px;
+  position: relative;
+  float: left;
+  border-style: dashed;
+  border-width: thin;
+  text-align: center;
+  background-color: lightgoldenrodyellow;
+  border-spacing: 0px;
+}
+
+.go-game-stone-container {
+  width: 20px;
+  height: 20px;
+  margin: 1.5px;
+}
+
+.go-game-stone {
+  width: 20px;
+  height: 20px;
 }
