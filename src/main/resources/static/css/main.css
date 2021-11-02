@@ -84,8 +84,9 @@ div {
 }
 
 .go-container {
-  width: 500px;
-  height: 500px;
+  top: 200px;
+  width: 550px;
+  height: 550px;
   margin-left: auto;
   margin-right: auto;
 }
@@ -93,27 +94,57 @@ div {
 .go-game-table {
   border-style: solid;
   border-collapse: collapse;
+  border-color: transparent;
+  position: absolute;
 }
 
 .go-game-table-point {
-  width: 23px;
-  height: 23px;
+  width: 26px;
+  height: 26px;
   position: relative;
   float: left;
   border-style: dashed;
   border-width: thin;
-  text-align: center;
-  background-color: lightgoldenrodyellow;
+  border-color: transparent;
   border-spacing: 0px;
+  text-align: center;
+  padding: 0px;
 }
 
 .go-game-stone-container {
   width: 20px;
   height: 20px;
-  margin: 1.5px;
+  margin: auto;
 }
 
 .go-game-stone {
   width: 20px;
   height: 20px;
+}
+
+.go-game-table-grid {
+  border-style: solid;
+  border-collapse: collapse;
+  position: absolute;
+  z-index: -1;
+  left: 13.5px;
+  top: 11px;
+}
+
+.go-game-table-grid-point {
+  width: 26px;
+  height: 26px;
+  position: relative;
+  float: left;
+  border-style: dashed;
+  border-width: thin;
+  border-spacing: 0px;
+  text-align: center;
+  padding: 0px;
+}
+
+.go-game-table-background {
+  background-color: goldenrod;
+  position: absolute;
+  z-index: -2;
 }

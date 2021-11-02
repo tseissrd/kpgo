@@ -77,7 +77,7 @@ public class GoService {
         Player human1 = new HumanPlayer(user);
         User user2 = authMgr._getAnyUser("player2");
         Player human2 = new HumanPlayer(user2);
-        Game newTestGame = new Game(human1, human2, 9, 9);
+        Game newTestGame = new Game(human1, human2, 19, 19);
         Resource<Game> testGameResource = new Resource<>();
         testGameResource = resMgr.writeContent(testGameResource, newTestGame);
         System.out.println("created new game: " + testGameResource.getId());

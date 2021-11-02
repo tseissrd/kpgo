@@ -11,6 +11,32 @@ async function heartbeat() {
     updateGameTable();
 }
 
+function constructBackground(width, height) {
+  const backgroundEl = document.createElement('div');
+  backgroundEl.className = 'go-game-table-background';
+  backgroundEl.style.width = width;
+  backgroundEl.style.height = height;
+  return backgroundEl;
+}
+
+function constructGrid(tableObject) {
+  const tableBackgroundEl = document.createElement('table');
+  tableBackgroundEl.className = 'go-game-table-grid';
+  for (let rowNumber = 0; rowNumber < tableObject.length - 1; rowNumber += 1) {
+    const row = tableObject[rowNumber];
+    const rowEl = document.createElement('tr');
+    rowEl.className = 'go-game-table-row-grid';
+    tableBackgroundEl.appendChild(rowEl);
+    for (let columnNumber = 0; columnNumber < row.length - 1; columnNumber += 1) {
+      const tablePointEl = document.createElement('td');
+      tablePointEl.className = 'go-game-table-grid-point';
+      rowEl.appendChild(tablePointEl);
+    }
+  }
+  
+  return tableBackgroundEl;
+}
+
 function constructGameTable(tableObject) {
   const tableEl = document.createElement('table');
   tableEl.className = 'go-game-table';
@@ -59,6 +85,11 @@ async function updateGameTable() {
   
   const table = constructGameTable(tableObject);
   gameTableDock.appendChild(table);
+  const grid = constructGrid(tableObject);
+  gameTableDock.appendChild(grid);
+  const tableRect = table.getBoundingClientRect();
+  const background = constructBackground(tableRect.width, tableRect.height);
+  gameTableDock.appendChild(background);
 }
 
 async function getState() {
