@@ -14,6 +14,7 @@ import javax.persistence.OneToOne;
 import javax.persistence.OneToMany;
 import javax.validation.constraints.NotEmpty;
 import java.io.Serializable;
+import java.util.Objects;
 
 /**
  *
@@ -34,7 +35,7 @@ implements Serializable
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+  private long id;
 
   @NotEmpty
   private String username;
@@ -68,8 +69,19 @@ implements Serializable
     return this.sessions.contains(session);
   }
   
-  public boolean equals(User user) {
-    return getUsername().equals(user.getUsername());
+  @Override
+  public boolean equals(Object user) {
+    if (user.getClass() == User.class)
+      return getUsername().equals(((User)user).getUsername());
+    return false;
+  }
+
+  @Override
+  public int hashCode() {
+    int hash = 7;
+    hash = 71 * hash + Objects.hashCode(this.id);
+    hash = 71 * hash + Objects.hashCode(this.username);
+    return hash;
   }
     
 }

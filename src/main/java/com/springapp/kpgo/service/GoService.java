@@ -53,6 +53,9 @@ public class GoService {
 
       Long gameId;
       Object gameIdData = data.get("game_id");
+      if (gameIdData == null)
+        return respBody;
+      
       if (gameIdData.getClass() == Integer.class) {
         gameId = ((Integer)gameIdData).longValue();
       } else if (gameIdData.getClass() == Long.class) {
@@ -64,7 +67,7 @@ public class GoService {
       
     //~~~~ TESTING
       try {
-        resMgr.getResource(1L);
+//        resMgr.getResource(1L);
       } catch (NoSuchElementException err) {
 //        Player human1 = new HumanPlayer(user);
 //        User user2 = authMgr._getAnyUser("player2");
@@ -122,6 +125,9 @@ public class GoService {
       
       Long gameId;
       Object gameIdData = data.get("game_id");
+      if (gameIdData == null)
+        return respBody;
+      
       if (gameIdData.getClass() == Integer.class) {
         gameId = ((Integer)gameIdData).longValue();
       } else if (gameIdData.getClass() == Long.class) {

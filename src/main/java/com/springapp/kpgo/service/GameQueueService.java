@@ -25,16 +25,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class GameQueueService {
     
     @Autowired
-    private DataRepository repository;
-    
-    @Autowired
     private AuthorizationManager authMgr;
     
     @Autowired
     private QueueManager qMgr;
     
     @RequestMapping("/queue")
-    public @ResponseBody Map<String, Object> queueEndpoint(@RequestHeader Map<String, String> headers, @RequestBody Map<String, Object> data, HttpServletRequest request, HttpServletResponse response) {
+    public @ResponseBody Map<String, Object> queueEndpoint(HttpServletRequest request, HttpServletResponse response) {
       User user = authMgr.authorize(request.getCookies());
       Map<String, Object> respBody = new HashMap<>();
       respBody.put("status", false);
@@ -43,7 +40,7 @@ public class GameQueueService {
         return respBody;
       }
 
-      long gameId = qMgr.enqueue(new HumanPlayer(user)).block();
+      long gameId = qMgr.enqueue(user).block();
       respBody.put("game_id", gameId);
       respBody.put("status", true);
       

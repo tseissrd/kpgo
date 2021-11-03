@@ -6,6 +6,7 @@
 package com.springapp.kpgo.go;
 
 import com.springapp.kpgo.model.User;
+import java.util.Objects;
 
 /**
  *
@@ -31,6 +32,20 @@ public class HumanPlayer extends Player {
   @Override
   public boolean is(User user) {
     return this.user.equals(user);
+  }
+  
+  @Override
+  public boolean equals(Object object) {
+    if (object.getClass() == HumanPlayer.class)
+      return ((HumanPlayer)object).is(getUser());
+    return false;
+  }
+
+  @Override
+  public int hashCode() {
+    int hash = 7;
+    hash = 79 * hash + Objects.hashCode(this.user);
+    return hash;
   }
   
 }

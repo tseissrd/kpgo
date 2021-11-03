@@ -42,6 +42,7 @@ public class ResourcesManager {
   }
 
   public void giveAccess(Resource resource, User user) {
+    System.out.println("will give access for " + resource.getId() + " to " + user.getUsername());
     resource.giveAccess(user);
     repository.save(resource);
   }

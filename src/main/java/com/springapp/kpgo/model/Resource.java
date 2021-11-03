@@ -63,8 +63,7 @@ implements Serializable
   }
   
   public void giveAccess(User user) {
-    if (!allowedUsers.contains(user))
-      allowedUsers.add(user);
+    allowedUsers.add(user);
   }
   
   public void denyAccess(User user) {
