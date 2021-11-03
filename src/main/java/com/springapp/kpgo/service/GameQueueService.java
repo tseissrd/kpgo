@@ -5,27 +5,17 @@
  */
 package com.springapp.kpgo.service;
 
-import com.springapp.kpgo.go.ComputerPlayer;
-import com.springapp.kpgo.go.Game;
+import com.springapp.kpgo.core.QueueManager;
 import com.springapp.kpgo.go.HumanPlayer;
-import com.springapp.kpgo.go.Player;
-import com.springapp.kpgo.go.Table;
 import org.springframework.web.bind.annotation.*;
 import java.util.Map;
-import java.util.List;
 import com.springapp.kpgo.repository.DataRepository;
 import com.springapp.kpgo.model.*;
 import com.springapp.kpgo.security.AuthorizationManager;
-import com.springapp.kpgo.security.ResourcesManager;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.NoSuchElementException;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 
 /**
  *
@@ -41,9 +31,7 @@ public class GameQueueService {
     private AuthorizationManager authMgr;
     
     @Autowired
-    private ResourcesManager resMgr;
-    
-    
+    private QueueManager qMgr;
     
     @RequestMapping("/queue")
     public @ResponseBody Map<String, Object> queueEndpoint(@RequestHeader Map<String, String> headers, @RequestBody Map<String, Object> data, HttpServletRequest request, HttpServletResponse response) {
@@ -55,9 +43,10 @@ public class GameQueueService {
         return respBody;
       }
 
-      
+      long gameId = qMgr.enqueue(new HumanPlayer(user)).block();
+      respBody.put("game_id", gameId);
+      respBody.put("status", true);
       
       return respBody;
     }
-    
 }

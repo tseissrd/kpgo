@@ -24,6 +24,10 @@ public class HumanPlayer extends Player {
     return user.getUsername();
   }
   
+  public User getUser() {
+    return user;
+  }
+  
   @Override
   public boolean is(User user) {
     return this.user.equals(user);

@@ -15,7 +15,7 @@ import java.util.Random;
  * @author Sovereign
  */
 public class Game
-implements Runnable, Serializable
+implements Serializable
 {
   
   private final Player[] players;
@@ -60,22 +60,6 @@ implements Runnable, Serializable
       actsNext = players[1];
     else
       actsNext = players[0];
-  }
-
-  @Override
-  public void run() {
-    while (true) {
-      for (Player player: players) {
-        if (player.passed) {
-          ended = true;
-          break;
-        }
-        
-      }
-      
-      if (ended)
-        break;
-    }
   }
   
 }

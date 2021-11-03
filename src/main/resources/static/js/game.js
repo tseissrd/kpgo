@@ -1,10 +1,31 @@
-const gameTableDock = document.getElementById('go-container');
+let gameId;
+startGame();
 
-const gameId = 1;
-let actsNext = false;
-updateGameTable();
+async function startGame() {
+  let gameQuery = {status: false};
+  while (gameQuery.status === false) {
+    gameQuery = await queryGame();
+  }
+  gameId = gameQuery.game_id;
+  play();
+}
 
-const heartbeatTimer = setInterval(heartbeat, 2000);
+async function play() {
+  const gameTableDock = document.getElementById('go-container');
+
+  let actsNext = false;
+  updateGameTable();
+
+  const heartbeatTimer = setInterval(heartbeat, 2000);
+}
+
+async function queryGame() {
+  const res = await fetch('/queue', {
+    method: 'GET'
+  });
+  
+  return await res.json();
+}
 
 async function heartbeat() {
   if (!actsNext)

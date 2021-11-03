@@ -66,23 +66,15 @@ public class GoService {
       try {
         resMgr.getResource(1L);
       } catch (NoSuchElementException err) {
-//        Player human = new HumanPlayer(user);
-//        Player computer = new ComputerPlayer();
-//        Game newTestGame = new Game(human, computer, 9, 9);
+//        Player human1 = new HumanPlayer(user);
+//        User user2 = authMgr._getAnyUser("player2");
+//        Player human2 = new HumanPlayer(user2);
+//        Game newTestGame = new Game(human1, human2, 19, 19);
 //        Resource<Game> testGameResource = new Resource<>();
 //        testGameResource = resMgr.writeContent(testGameResource, newTestGame);
 //        System.out.println("created new game: " + testGameResource.getId());
 //        resMgr.giveAccess(testGameResource, user);
-        
-        Player human1 = new HumanPlayer(user);
-        User user2 = authMgr._getAnyUser("player2");
-        Player human2 = new HumanPlayer(user2);
-        Game newTestGame = new Game(human1, human2, 19, 19);
-        Resource<Game> testGameResource = new Resource<>();
-        testGameResource = resMgr.writeContent(testGameResource, newTestGame);
-        System.out.println("created new game: " + testGameResource.getId());
-        resMgr.giveAccess(testGameResource, user);
-        resMgr.giveAccess(testGameResource, user2);
+//        resMgr.giveAccess(testGameResource, user2);
       }
     //~~~~
       

@@ -1,3 +1,2 @@
-async function queryGame() {
-  
-}
+
+
