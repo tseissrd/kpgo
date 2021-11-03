@@ -12,6 +12,7 @@ import javax.persistence.Id;
 import java.util.Set;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
@@ -30,7 +31,7 @@ implements Serializable
   
   private final String name;
   
-  @OneToMany
+  @ManyToMany
   private final Set<User> allowedUsers;
   
   @OneToOne(targetEntity=Content.class)

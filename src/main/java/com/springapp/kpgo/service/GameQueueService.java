@@ -40,7 +40,9 @@ public class GameQueueService {
         return respBody;
       }
 
+      System.out.println("waiting in queue");
       long gameId = qMgr.enqueue(user).block();
+      System.out.println("got game!");
       respBody.put("game_id", gameId);
       respBody.put("status", true);
       

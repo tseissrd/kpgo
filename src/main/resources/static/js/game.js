@@ -1,4 +1,6 @@
 let gameId;
+const gameTableDock = document.getElementById('go-container');
+let actsNext = false;
 startGame();
 
 async function startGame() {
@@ -11,9 +13,6 @@ async function startGame() {
 }
 
 async function play() {
-  const gameTableDock = document.getElementById('go-container');
-
-  let actsNext = false;
   updateGameTable();
 
   const heartbeatTimer = setInterval(heartbeat, 2000);
