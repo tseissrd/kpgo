@@ -12,6 +12,7 @@ import java.util.HashMap;
 import org.springframework.data.jpa.repository.JpaRepository;
 import com.springapp.kpgo.model.*;
 import java.util.Map;
+import javax.transaction.Transactional;
 
 /**
  *
@@ -63,6 +64,7 @@ public class DataRepository
         this.initialized = true;
     }
     
+    @Transactional
     public <S> S save(S entity) {
       init();
       String className = entity.getClass().getCanonicalName();
@@ -74,6 +76,7 @@ public class DataRepository
       return (S)repository.save(entity);
     }
     
+    @Transactional
     public <S> boolean delete(S entity) {
       init();
       String className = entity.getClass().getCanonicalName();

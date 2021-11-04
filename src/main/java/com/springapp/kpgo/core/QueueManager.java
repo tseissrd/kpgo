@@ -22,7 +22,12 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingDeque;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.PersistenceContext;
+import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
@@ -37,39 +42,27 @@ import reactor.core.scheduler.Schedulers;
 public class QueueManager {
   
   @Autowired
-  ResourcesManager resMgr;
+  private ResourcesManager resMgr;
+  
+  @Autowired
+  private EntityManagerFactory emf;
 
   private final BlockingDeque<User> playerQueue;
-  private final Queue<User> serviceQueue;
   private final Set<User> usersInQueue;
-  private final Flux<Resource<Game>> queueEvents;
+  private Flux<Resource<Game>> queueEvents;
   
   private QueueManager() {
     System.out.println("created new queue mgr");
     playerQueue = new LinkedBlockingDeque<>();
     usersInQueue = new HashSet<>();
-    serviceQueue = new ConcurrentLinkedQueue();
-    Flux<Resource<Game>> gameEvents = Flux.<Resource<Game>>create(sink -> {
-      sink.onRequest(num -> {
-        if (usersInQueue.size() < 2)
-          sink.error(new Error("concurrency error"));
-        
-        User user1 = null;
-        User user2 = null;
-        try {
-          user1 = serviceQueue.remove();
-          user2 = serviceQueue.remove();
-        } catch (NoSuchElementException err) {
-          sink.error(err);
-        }
-        
-        sink.next(startGame(user1, user2));
-      });
-    });
-    
-    queueEvents = Flux.<Resource<Game>>generate(sink -> {
+    initGameGenerator();
+  }
+  
+  private void initGameGenerator() {
+    queueEvents = Flux.<Resource<Game>>create(sink -> {
       System.out.println("started queue thread");
       while (true) {
+        // EntityManager eMgr = emf.createEntityManager();
         User user1 = null;
         User user2 = null;
 
@@ -96,10 +89,7 @@ public class QueueManager {
         }
 
         System.out.println("took second player from the queue");
-        serviceQueue.add(user1);
-        serviceQueue.add(user2);
-        System.out.println("put all players to serviceQueue");
-        sink.next(gameEvents.take(1).blockFirst());
+        sink.next(startGame(user1, user2));
       }
     }).subscribeOn(Schedulers.boundedElastic())
       .share();
@@ -112,14 +102,7 @@ public class QueueManager {
     Game game = new Game(player1, player2, 19, 19);
     Resource<Game> gameResource = resMgr.writeContent(new Resource<>(), game);
     System.out.println("new game id is " + gameResource.getId());
-    try {
-      System.out.println("giving access to " + user1.getUsername());
-      resMgr.giveAccess(gameResource, user1);
-    } catch (ClassCastException err) {}
-    try {
-      System.out.println("giving access to " + user2.getUsername());
-      resMgr.giveAccess(gameResource, user2);
-    } catch (ClassCastException err) {}
+    resMgr.giveAccess(gameResource, Arrays.asList(user1, user2));
     
     System.out.println("started a new game");
     return gameResource;

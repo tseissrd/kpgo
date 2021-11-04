@@ -13,6 +13,7 @@ import com.springapp.kpgo.model.Session;
 import com.springapp.kpgo.model.Content;
 import java.io.Serializable;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.NoSuchElementException;
 import javax.servlet.http.Cookie;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +45,11 @@ public class ResourcesManager {
   public void giveAccess(Resource resource, User user) {
     System.out.println("will give access for " + resource.getId() + " to " + user.getUsername());
     resource.giveAccess(user);
+    repository.save(resource);
+  }
+  
+  public void giveAccess(Resource resource, Collection<User> users) {
+    resource.giveAccess(users);
     repository.save(resource);
   }
   

@@ -15,6 +15,7 @@ import com.springapp.kpgo.security.AuthorizationManager;
 import java.util.HashMap;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -30,6 +31,7 @@ public class GameQueueService {
     @Autowired
     private QueueManager qMgr;
     
+    @Transactional
     @RequestMapping("/queue")
     public @ResponseBody Map<String, Object> queueEndpoint(HttpServletRequest request, HttpServletResponse response) {
       User user = authMgr.authorize(request.getCookies());

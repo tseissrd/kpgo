@@ -6,7 +6,9 @@
 package com.springapp.kpgo.model;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import java.util.Set;
@@ -65,6 +67,10 @@ implements Serializable
   
   public void giveAccess(User user) {
     allowedUsers.add(user);
+  }
+  
+  public void giveAccess(Collection<User> users) {
+    allowedUsers.addAll(users);
   }
   
   public void denyAccess(User user) {
