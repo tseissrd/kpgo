@@ -10,24 +10,14 @@ import com.springapp.kpgo.go.HumanPlayer;
 import com.springapp.kpgo.go.Player;
 import com.springapp.kpgo.model.Resource;
 import com.springapp.kpgo.model.User;
-import com.springapp.kpgo.security.AuthorizationManager;
 import com.springapp.kpgo.security.ResourcesManager;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.NoSuchElementException;
-import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.BlockingDeque;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingDeque;
-import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.PersistenceContext;
-import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
@@ -62,20 +52,16 @@ public class QueueManager {
     queueEvents = Flux.<Resource<Game>>create(sink -> {
       System.out.println("started queue thread");
       while (true) {
-        // EntityManager eMgr = emf.createEntityManager();
         User user1 = null;
         User user2 = null;
 
         try {
-          System.out.println("waiting for first player from the queue");
           user1 = playerQueue.take();
         } catch (InterruptedException err) {
           sink.error(err);
         }
 
-        System.out.println("took first player from the queue");
         try {
-          System.out.println("waiting for second player from the queue");
           user2 = playerQueue.take();
           usersInQueue.remove(user1);
           usersInQueue.remove(user2);
@@ -88,7 +74,6 @@ public class QueueManager {
           sink.error(err);
         }
 
-        System.out.println("took second player from the queue");
         sink.next(startGame(user1, user2));
       }
     }).subscribeOn(Schedulers.boundedElastic())
@@ -101,7 +86,6 @@ public class QueueManager {
     Player player2 = new HumanPlayer(user2);
     Game game = new Game(player1, player2, 19, 19);
     Resource<Game> gameResource = resMgr.writeContent(new Resource<>(), game);
-    System.out.println("new game id is " + gameResource.getId());
     resMgr.giveAccess(gameResource, Arrays.asList(user1, user2));
     
     System.out.println("started a new game");
@@ -109,11 +93,9 @@ public class QueueManager {
   }
   
   public Mono<Long> enqueue(final User user) {
-    System.out.println("enqueing new player, queue length is now " + playerQueue.size());
+    Disposable queueSub;
     Mono<Long> result = Mono.create(sink -> {
-      System.out.println("in mono, waiting for game events");
-      // queueEvents.doOnNext(gameResource -> {
-      queueEvents.subscribe(gameResource -> {
+      queueSub = queueEvents.subscribe(gameResource -> {
         System.out.println("new game started, check if it contains current user");
         Game game = gameResource.getContent().read();
         Player[] players = game.getPlayers();
@@ -125,6 +107,8 @@ public class QueueManager {
         }
       });
     });
+    
+    result.doOnSuccess(() -> queueSub.dispose());
     
     try {
       usersInQueue.forEach(user1 -> System.out.println(user1.getUsername()));
