@@ -7,6 +7,7 @@ package com.springapp.kpgo.service;
 
 import com.springapp.kpgo.go.Game;
 import com.springapp.kpgo.go.Player;
+import com.springapp.kpgo.go.TablePoint;
 import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 import java.util.List;
@@ -19,6 +20,7 @@ import java.util.HashMap;
 import java.util.NoSuchElementException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 
@@ -64,6 +66,7 @@ public class GoService {
       return gameResource;
     }
     
+    @Transactional
     @RequestMapping("/go/state")
     public @ResponseBody Map<String, Object> goStateEndpoint(@RequestHeader Map<String, String> headers, @RequestBody Map<String, Object> data, HttpServletRequest request, HttpServletResponse response) {
       Map<String, Object> respBody = new HashMap<>();
@@ -108,6 +111,7 @@ public class GoService {
       return respBody;
     }
     
+    @Transactional
     @RequestMapping("/go/act")
     public @ResponseBody Map<String, Object> goActEndpoint(@RequestHeader Map<String, String> headers, @RequestBody Map<String, Object> data, HttpServletRequest request, HttpServletResponse response) {
       Map<String, Object> respBody = new HashMap<>();
@@ -158,16 +162,17 @@ public class GoService {
       for (Player tempPlayer: game.getPlayers()) {
         if (tempPlayer.is(user)) {
           player = tempPlayer;
-          System.out.println("detected that player " + tempPlayer.getName() + " is user " + user.getUsername());
           break;
         }
       }
       
       if ((player != null) && (game.playerToAct() == player)) {
         if (actionType.equals("place_stone")) {
-          System.out.println("x: " + pointParam.get(0));
-          System.out.println("y: " + pointParam.get(1));
-          player.takeTurn(game.getTable().getPoint(pointParam.get(0), pointParam.get(1)));
+          TablePoint point = game.getTable().getPoint(pointParam.get(0), pointParam.get(1));
+          if (game.checkMove(player.getBowl().colour, point))
+            player.takeTurn(point);
+          else
+            return respBody;
           game.nextMove();
           resMgr.writeContent(gameResource, game);
           respBody.put("status", true);

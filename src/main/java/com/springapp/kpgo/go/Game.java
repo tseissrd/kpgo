@@ -1,23 +1,17 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.springapp.kpgo.go;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -32,6 +26,7 @@ implements Serializable
   private boolean ended;
   private Player winner;
   private Player actsNext;
+  private TablePoint koRulePoint;
   
   protected Game() {
     players = null;
@@ -50,6 +45,7 @@ implements Serializable
     actsNext = players[whiteBowlPlayerNumber];
     winner = null;
     ended = false;
+    koRulePoint = null;
   }
   
   public Player[] getPlayers() {
@@ -65,6 +61,10 @@ implements Serializable
   }
   
   public Set<TablePoint> getBorderingPoints(TablePoint point) {
+    return getBorderingPoints(point, new HashSet<>());
+  }
+  
+  private Set<TablePoint> getBorderingPoints(TablePoint point, Set<TablePoint> exclude) {
     Set<TablePoint> borderingPoints = new HashSet<>();
     List<Integer> xDirections = new LinkedList();
     List<Integer> yDirections = new LinkedList();
@@ -79,27 +79,42 @@ implements Serializable
       yDirections.add(1);
     
     for (Integer xDirection: xDirections) {
-      for (Integer yDirection: yDirections) {
-        TablePoint otherPoint = table.getPoint(point.x + xDirection, point.y + yDirection);
+      TablePoint otherPoint = table.getPoint(point.x + xDirection, point.y);
+      if (!exclude.contains(otherPoint))
         borderingPoints.add(otherPoint);
-      }
+    }
+    
+    for (Integer yDirection: yDirections) {
+      TablePoint otherPoint = table.getPoint(point.x, point.y + yDirection);
+      if (!exclude.contains(otherPoint))
+        borderingPoints.add(otherPoint);
     }
     
     return borderingPoints;
   }
   
   public Set<TablePoint> getPointGroupFor(TablePoint point) {
+    return getPointGroupFor(point, new HashSet<>());
+  }
+  
+  private Set<TablePoint> getPointGroupFor(TablePoint point, Set<TablePoint> exclude) {
     Set<TablePoint> pointGroup = new HashSet<>();
     pointGroup.add(point);
     for (TablePoint otherPoint: getBorderingPoints(point)) {
-      if ((otherPoint.getStone() != null) && (otherPoint.getStone().colour.equals(point.getStone().colour)))
-        pointGroup.addAll(getPointGroupFor(otherPoint));
+      if (!exclude.contains(otherPoint)) {
+        if ((otherPoint.getStone() != null) && (otherPoint.getStone().colour.equals(point.getStone().colour))) {
+          Set<TablePoint> chainedExclude = new HashSet<>(exclude);
+          chainedExclude.add(point);
+          pointGroup.addAll(getPointGroupFor(otherPoint, chainedExclude));
+        }
+      }
     }
         
     return pointGroup;
   }
   
   public int getBreathsForPointGroup(Set<TablePoint> pointGroup) {
+    
     int breaths = 0;
     
     for (TablePoint point: pointGroup) {
@@ -107,7 +122,7 @@ implements Serializable
       int pointBreaths = borderingPoints.size();
       
       for (TablePoint otherPoint: borderingPoints) {
-        if ((otherPoint.getStone() != null) && (!otherPoint.getStone().colour.equals(point.getStone().colour)))
+        if (otherPoint.getStone() != null)
           pointBreaths += -1;
       }
 
@@ -118,8 +133,10 @@ implements Serializable
     return breaths;
   }
   
-  public boolean checkMove(Stone stone, TablePoint point) {
-    // сделать проверку на случаи, когда после хода вражеский камень будет захвачен и появятся новые дыхания
+  public boolean checkMove(Colour colour, TablePoint point) {
+    if ((koRulePoint != null) && (point.equals(koRulePoint)))
+      return false;
+      
     Set<TablePoint> borderingPoints = getBorderingPoints(point);
     int personalBreaths = borderingPoints.size();
     int maxGroupBreaths = 0;
@@ -132,7 +149,7 @@ implements Serializable
     
     for (TablePoint otherPoint: borderingPoints) {
       if (otherPoint.getStone() != null) {
-        if (otherPoint.getStone().colour.equals(point.getStone().colour)) {
+        if (otherPoint.getStone().colour.equals(colour)) {
           int groupBreaths = getBreathsForPointGroup(getPointGroupFor(otherPoint));
           if (groupBreaths > maxGroupBreaths)
             maxGroupBreaths = groupBreaths;
@@ -142,25 +159,49 @@ implements Serializable
     
     if ((personalBreaths > 0) || (maxGroupBreaths - 1 > 0))
       return true;
-    else
+    else {
+      return mockCheckMove(colour, point); // проверка на случаи, когда после хода вражеский камень будет захвачен и появятся новые дыхания
+    }
+  }
+  
+  public boolean mockCheckMove(Colour colour, TablePoint point) {
+    final Game nextState = copy();
+    final TablePoint pointInQuestion = nextState.getTable().getPoint(point.x, point.y);
+    try {
+      pointInQuestion.putStone(new Stone(colour));
+    } catch (TablePoint.PointOccupiedException ex) {
+      throw new Error(ex);
+    }
+    
+    nextState.processTable();
+    int nextStateBreaths = nextState.getBreathsForPointGroup(nextState.getPointGroupFor(pointInQuestion));
+    if (nextStateBreaths == 0)
       return false;
+    return true;
   }
   
   public void processTable() {
     Set<TablePoint> pointsToCheck = new HashSet<>(table.getPoints()
       .parallelStream()
       .filter((TablePoint point) -> {
-        return !point.getStone().colour.equals(actsNext.getBowl().colour);
+        return (point.getStone() != null) && (!point.getStone().colour.equals(actsNext.getBowl().colour));
       }).toList());
     
     Set<TablePoint> pointsToClear = new HashSet<>();
     
-    for (TablePoint point: pointsToCheck) {
+    while (pointsToCheck.size() > 0) {
+      TablePoint point = (TablePoint)pointsToCheck.toArray()[0];
       Set<TablePoint> pointGroup = getPointGroupFor(point);
       pointsToCheck.removeAll(pointGroup);
       if (getBreathsForPointGroup(pointGroup) == 0)
         pointsToClear.addAll(pointGroup);
     }
+    
+    // Ko rule protection
+    if (pointsToClear.size() == 1)
+      koRulePoint = (TablePoint)pointsToClear.toArray()[0];
+    else
+      koRulePoint = null;
     
     pointsToClear.parallelStream()
       .forEach(point -> {
@@ -178,6 +219,24 @@ implements Serializable
       actsNext = players[1];
     else
       actsNext = players[0];
+  }
+  
+  private Game copy() {
+    Game gameCopy = null;
+    try {
+      ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
+      ObjectOutputStream out = new ObjectOutputStream(byteOut);
+      out.writeObject(this);
+      byte[] buf = byteOut.toByteArray();
+      out.close();
+      
+      ObjectInputStream in = new ObjectInputStream(new ByteArrayInputStream(buf));
+      gameCopy = (Game)in.readObject();
+      in.close();
+    } catch (Exception ex) {
+      throw new Error(ex);
+    }
+    return gameCopy;
   }
   
 }

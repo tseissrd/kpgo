@@ -36,7 +36,7 @@ public class AuthorizationManager {
     public User authorize(String username, Password password) {
       User user = getUser(username);
       if ((user != null) && (user.getPassword().equals(password))) {
-          System.out.println("authorization success");
+          // System.out.println("authorization success");
           return user;
       } else
           return null;
@@ -45,7 +45,7 @@ public class AuthorizationManager {
     public User authorize(String username, Session session) {
       User user = getUser(username);
       if ((user != null) && (user.checkSession(session))) {
-          System.out.println("authorization success");
+          // System.out.println("authorization success");
           return user;
       } else
           return null;
