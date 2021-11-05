@@ -16,7 +16,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.LinkedBlockingDeque;
-import javax.persistence.EntityManagerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import reactor.core.Disposable;
@@ -33,9 +32,6 @@ public class QueueManager {
   
   @Autowired
   private ResourcesManager resMgr;
-  
-  @Autowired
-  private EntityManagerFactory emf;
 
   private final BlockingDeque<User> playerQueue;
   private final Set<User> usersInQueue;
@@ -93,30 +89,25 @@ public class QueueManager {
   }
   
   public Mono<Long> enqueue(final User user) {
-    Disposable queueSub;
     Mono<Long> result = Mono.create(sink -> {
-      queueSub = queueEvents.subscribe(gameResource -> {
-        System.out.println("new game started, check if it contains current user");
+      Disposable fluxDisp = queueEvents.subscribe(gameResource -> {
         Game game = gameResource.getContent().read();
         Player[] players = game.getPlayers();
         for (Player player: players) {
           if (player.is(user)) {
-            System.out.println("it does!");
             sink.success(gameResource.getId());
           }
         }
       });
+      
+      sink.onDispose(() -> {
+        fluxDisp.dispose();
+      });
     });
     
-    result.doOnSuccess(() -> queueSub.dispose());
-    
     try {
-      usersInQueue.forEach(user1 -> System.out.println(user1.getUsername()));
-      usersInQueue.forEach(user1 -> System.out.println(user.equals(user1)));
-      System.out.println(usersInQueue.contains(user));
-      if (usersInQueue.add(user)) {
+      if (usersInQueue.add(user))
         playerQueue.put(user);
-      }
     } catch (InterruptedException err) {
       return Mono.error(err);
     }

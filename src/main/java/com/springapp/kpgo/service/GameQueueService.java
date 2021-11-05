@@ -6,10 +6,8 @@
 package com.springapp.kpgo.service;
 
 import com.springapp.kpgo.core.QueueManager;
-import com.springapp.kpgo.go.HumanPlayer;
 import org.springframework.web.bind.annotation.*;
 import java.util.Map;
-import com.springapp.kpgo.repository.DataRepository;
 import com.springapp.kpgo.model.*;
 import com.springapp.kpgo.security.AuthorizationManager;
 import java.util.HashMap;

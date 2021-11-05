@@ -5,16 +5,13 @@
  */
 package com.springapp.kpgo.service;
 
-import com.springapp.kpgo.go.ComputerPlayer;
 import com.springapp.kpgo.go.Game;
-import com.springapp.kpgo.go.HumanPlayer;
 import com.springapp.kpgo.go.Player;
-import com.springapp.kpgo.go.Table;
 import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 import java.util.List;
-import com.springapp.kpgo.repository.DataRepository;
 import com.springapp.kpgo.model.*;
+import com.springapp.kpgo.security.AccessForbiddenException;
 import com.springapp.kpgo.security.AuthorizationManager;
 import com.springapp.kpgo.security.ResourcesManager;
 import java.util.ArrayList;
@@ -33,63 +30,61 @@ import org.springframework.http.HttpStatus;
 public class GoService {
     
     @Autowired
-    private DataRepository repository;
-    
-    @Autowired
     private AuthorizationManager authMgr;
     
     @Autowired
     private ResourcesManager resMgr;
     
-    @RequestMapping("/go/state")
-    public @ResponseBody Map<String, Object> goStateEndpoint(@RequestHeader Map<String, String> headers, @RequestBody Map<String, Object> data, HttpServletRequest request, HttpServletResponse response) {
-      User user = authMgr.authorize(request.getCookies());
-      Map<String, Object> respBody = new HashMap<>();
-      respBody.put("status", false);
-      if (user == null) {
-        LoginService.redirectToLogin(response);
-        return respBody;
-      }
-
+    public Resource<Game> getGameResource(User user, Map<String, Object> requestBody)
+    throws InvalidRequestException, GameNotFoundException, AccessForbiddenException
+    {
       Long gameId;
-      Object gameIdData = data.get("game_id");
+      Object gameIdData = requestBody.get("game_id");
       if (gameIdData == null)
-        return respBody;
+        throw new InvalidRequestException();
       
       if (gameIdData.getClass() == Integer.class) {
         gameId = ((Integer)gameIdData).longValue();
       } else if (gameIdData.getClass() == Long.class) {
-        gameId = (Long)data.get("game_id");
+        gameId = (Long)requestBody.get("game_id");
       } else {
-        return respBody;
+        throw new InvalidRequestException();
       }
       Resource<Game> gameResource;
-      
-    //~~~~ TESTING
-      try {
-//        resMgr.getResource(1L);
-      } catch (NoSuchElementException err) {
-//        Player human1 = new HumanPlayer(user);
-//        User user2 = authMgr._getAnyUser("player2");
-//        Player human2 = new HumanPlayer(user2);
-//        Game newTestGame = new Game(human1, human2, 19, 19);
-//        Resource<Game> testGameResource = new Resource<>();
-//        testGameResource = resMgr.writeContent(testGameResource, newTestGame);
-//        System.out.println("created new game: " + testGameResource.getId());
-//        resMgr.giveAccess(testGameResource, user);
-//        resMgr.giveAccess(testGameResource, user2);
-      }
-    //~~~~
       
       try {
         gameResource = resMgr.getResource(gameId);
       } catch (NoSuchElementException err) {
-        respBody.put("message", err.getLocalizedMessage());
-        response.setStatus(HttpStatus.NOT_FOUND.value());
+        throw new GameNotFoundException();
+      }
+      
+      if (!gameResource.checkAccess(user))
+        throw new AccessForbiddenException();
+      
+      return gameResource;
+    }
+    
+    @RequestMapping("/go/state")
+    public @ResponseBody Map<String, Object> goStateEndpoint(@RequestHeader Map<String, String> headers, @RequestBody Map<String, Object> data, HttpServletRequest request, HttpServletResponse response) {
+      Map<String, Object> respBody = new HashMap<>();
+      respBody.put("status", false);
+      
+      User user = authMgr.authorize(request.getCookies());
+      if (user == null) {
+        LoginService.redirectToLogin(response);
         return respBody;
       }
       
-      if (!gameResource.checkAccess(user)) {
+      Resource<Game> gameResource;
+      try {
+        gameResource = getGameResource(user, data);
+      } catch (InvalidRequestException ex) {
+        return respBody;
+      } catch (GameNotFoundException ex) {
+        respBody.put("message", ex.getLocalizedMessage());
+        response.setStatus(HttpStatus.NOT_FOUND.value());
+        return respBody;
+      } catch (AccessForbiddenException ex) {
         response.setStatus(HttpStatus.FORBIDDEN.value());
         return respBody;
       }
@@ -115,46 +110,22 @@ public class GoService {
     
     @RequestMapping("/go/act")
     public @ResponseBody Map<String, Object> goActEndpoint(@RequestHeader Map<String, String> headers, @RequestBody Map<String, Object> data, HttpServletRequest request, HttpServletResponse response) {
-      User user = authMgr.authorize(request.getCookies());
       Map<String, Object> respBody = new HashMap<>();
       respBody.put("status", false);
+      
+      User user = authMgr.authorize(request.getCookies());
       if (user == null) {
         LoginService.redirectToLogin(response);
         return respBody;
       }
       
-      Long gameId;
-      Object gameIdData = data.get("game_id");
-      if (gameIdData == null)
-        return respBody;
-      
-      if (gameIdData.getClass() == Integer.class) {
-        gameId = ((Integer)gameIdData).longValue();
-      } else if (gameIdData.getClass() == Long.class) {
-        gameId = (Long)data.get("game_id");
-      } else {
-        return respBody;
-      }
-      
       Map<String, Object> action = (Map<String, Object>)data.get("action");
-      if ((gameId == null) || (action == null))
+      if (action == null)
         return respBody;
       
       String actionType = (String)action.get("type");
       if (actionType == null)
         return respBody;
-      
-//      {
-//      game_id: "321",
-//      action: {
-//        type: 'place_stone',
-//        params: {
-//          point: [3, 5]
-//        }
-//      }
-//    }
-
-      Resource<Game> gameResource;
       
       Map<String, Object> actionParams = (Map<String, Object>)action.get("params");
       if (actionParams == null)
@@ -167,15 +138,16 @@ public class GoService {
           return respBody;
       }
       
+      Resource<Game> gameResource;
       try {
-        gameResource = resMgr.getResource(gameId);
-      } catch (NoSuchElementException err) {
-        respBody.put("message", err.getLocalizedMessage());
+        gameResource = getGameResource(user, data);
+      } catch (InvalidRequestException ex) {
+        return respBody;
+      } catch (GameNotFoundException ex) {
+        respBody.put("message", ex.getLocalizedMessage());
         response.setStatus(HttpStatus.NOT_FOUND.value());
         return respBody;
-      }
-      
-      if (!gameResource.checkAccess(user)) {
+      } catch (AccessForbiddenException ex) {
         response.setStatus(HttpStatus.FORBIDDEN.value());
         return respBody;
       }

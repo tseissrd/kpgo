@@ -7,7 +7,6 @@ package com.springapp.kpgo.repository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import com.springapp.kpgo.repository.*;
 import java.util.HashMap;
 import org.springframework.data.jpa.repository.JpaRepository;
 import com.springapp.kpgo.model.*;
