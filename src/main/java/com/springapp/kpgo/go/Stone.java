@@ -21,6 +21,7 @@ implements Serializable
     this.colour = colour;
   }
   
+  @Override
   public String toString() {
     return colour.toString();
   }

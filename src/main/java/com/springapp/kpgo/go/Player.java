@@ -25,7 +25,13 @@ implements Serializable
   public void takeTurn(TablePoint point) {
     if (point.getStone() == null) {
       if (bowl.stonesLeft() > 0) {
-        point.putStone(bowl.getStone());
+        try {
+          point.putStone(bowl.getStone());
+        } catch (Bowl.NoStonesLeftException ex) {
+          throw new Error(ex);
+        } catch (TablePoint.PointOccupiedException ex) {
+          throw new Error(ex);
+        }
       }
     }
   }

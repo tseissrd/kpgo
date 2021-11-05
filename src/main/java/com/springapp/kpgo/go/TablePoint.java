@@ -15,23 +15,39 @@ public class TablePoint
 implements Serializable
 {
   
-  public class PointOccupiedError extends Error {};
+  public class PointVacantException extends Exception {};
+  public class PointOccupiedException extends Exception {};
   
   private Stone stone;
+  public final int x;
+  public final int y;
   
-  public TablePoint() {
-    stone = null;
+  public TablePoint(int x, int y) {
+    this.x = x;
+    this.y = y;
+    this.stone = null;
   }
   
   public Stone getStone() {
     return stone;
   }
   
-  public void putStone(Stone stone) {
+  public void putStone(Stone stone)
+  throws PointOccupiedException
+  {
     if (this.stone == null)
       this.stone = stone;
     else
-      throw new PointOccupiedError();
+      throw new PointOccupiedException();
+  }
+  
+  public void removeStone()
+  throws PointVacantException
+  {
+    if (this.stone != null)
+      this.stone = null;
+    else
+      throw new PointVacantException();
   }
   
 }

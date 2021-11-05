@@ -15,7 +15,7 @@ public class Bowl
 implements Serializable
 {
   
-  public class NoStonesLeftError extends Error {};
+  public class NoStonesLeftException extends Exception {};
   
   public final Colour colour;
   private int stones;
@@ -29,11 +29,13 @@ implements Serializable
     return stones;
   }
   
-  public Stone getStone() {
+  public Stone getStone()
+  throws NoStonesLeftException  
+  {
     if (stonesLeft() > 0)
       return new Stone(colour);
     else
-      throw new NoStonesLeftError();
+      throw new NoStonesLeftException();
   }
   
 }

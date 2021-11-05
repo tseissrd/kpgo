@@ -7,8 +7,9 @@ package com.springapp.kpgo.go;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  *
@@ -28,15 +29,12 @@ implements Serializable
     this.width = width;
     this.height = height;
     points = new ArrayList<>(width);
-    for (int columnNum = 0; columnNum < width; columnNum += 1)
+    for (int columnNum = 0; columnNum < width; columnNum += 1) {
       points.add(new ArrayList<>(height));
-    
-    points.parallelStream()
-      .forEach(column -> {
-        for (int rowNum = 0; rowNum < height; rowNum += 1) {
-          column.add(new TablePoint());
-        }
-      });
+      ArrayList<TablePoint> column = points.get(columnNum);
+      for (int rowNum = 0; rowNum < height; rowNum += 1)
+        column.add(new TablePoint(columnNum, rowNum));
+    }
   }
   
   public TablePoint getPoint(int x, int y) {
@@ -44,6 +42,18 @@ implements Serializable
       throw new SizeExceededError();
     
     return points.get(x).get(y);
+  }
+  
+  public Set<TablePoint> getPoints() {
+    Set<TablePoint> allPoints = new HashSet<>();
+    
+    for (int x = 0; x < width; x += 1) {
+      for (int y = 0; y < height; y += 1) {
+        allPoints.add(getPoint(x, y));
+      }
+    }
+    
+    return allPoints;
   }
   
   public List<List<String>> jsonView() {
