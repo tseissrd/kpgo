@@ -7,11 +7,17 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -27,10 +33,12 @@ implements Serializable
   private Player winner;
   private Player actsNext;
   private TablePoint koRulePoint;
+  private final double komi;
   
   protected Game() {
     players = null;
     table = null;
+    komi = 6.5;
   }
   
   public Game(Player player1, Player player2, int tableWidth, int tableHeight) {
@@ -42,10 +50,11 @@ implements Serializable
     int whiteBowlPlayerNumber = new Random(Calendar.getInstance().toInstant().getEpochSecond()).nextInt(2);
     players[whiteBowlPlayerNumber].assignBowl(new Bowl(Colour.WHITE));
     players[1 - whiteBowlPlayerNumber].assignBowl(new Bowl(Colour.BLACK));
-    actsNext = players[whiteBowlPlayerNumber];
+    actsNext = players[1 - whiteBowlPlayerNumber];
     winner = null;
     ended = false;
     koRulePoint = null;
+    komi = 6.5;
   }
   
   public Player[] getPlayers() {
@@ -92,6 +101,19 @@ implements Serializable
     
     return borderingPoints;
   }
+
+  public Set<TablePoint> getBorderingPoints(Set<TablePoint> pointGroup) {
+    return getBorderingPoints(pointGroup, pointGroup);
+  }
+  
+  private Set<TablePoint> getBorderingPoints(Set<TablePoint> pointGroup, Set<TablePoint> exclude) {
+    Set<TablePoint> borderingPoints = new HashSet<>();
+    
+    for (TablePoint point: pointGroup)
+      borderingPoints.addAll(getBorderingPoints(point, exclude));
+    
+    return borderingPoints;
+  }
   
   public Set<TablePoint> getPointGroupFor(TablePoint point) {
     return getPointGroupFor(point, new HashSet<>());
@@ -100,12 +122,16 @@ implements Serializable
   private Set<TablePoint> getPointGroupFor(TablePoint point, Set<TablePoint> exclude) {
     Set<TablePoint> pointGroup = new HashSet<>();
     pointGroup.add(point);
+    
+    Set<TablePoint> downstreamExclude = new HashSet<>(exclude);
+    downstreamExclude.add(point);
+    
     for (TablePoint otherPoint: getBorderingPoints(point)) {
       if (!exclude.contains(otherPoint)) {
-        if ((otherPoint.getStone() != null) && (otherPoint.getStone().colour.equals(point.getStone().colour))) {
-          Set<TablePoint> chainedExclude = new HashSet<>(exclude);
-          chainedExclude.add(point);
-          pointGroup.addAll(getPointGroupFor(otherPoint, chainedExclude));
+        if ((point.getStone() == null) && (otherPoint.getStone() == null))
+          pointGroup.addAll(getPointGroupFor(otherPoint, downstreamExclude));
+        else if ((otherPoint.getStone() != null) && (otherPoint.getStone().colour.equals(point.getStone().colour))) {
+          pointGroup.addAll(getPointGroupFor(otherPoint, downstreamExclude));
         }
       }
     }
@@ -215,10 +241,101 @@ implements Serializable
   
   public void nextMove() {
     processTable();
+    Player currentPlayer = actsNext;
+    
     if (actsNext == players[0])
       actsNext = players[1];
     else
       actsNext = players[0];
+    
+    Player nextPlayer = actsNext;
+    if (currentPlayer.didPass() && nextPlayer.didPass())
+      endGame();
+    else
+      nextPlayer.resetPassed();
+  }
+  
+  public void claimTerritories() {
+    Set<TablePoint> pointsToCheck = new HashSet<>();
+    table.getPoints()
+      .stream()
+      .filter(point -> point.getStone() == null)
+      .forEach(point -> pointsToCheck.add(point));
+    
+    Map<Colour, Set<TablePoint>> territories = new HashMap<>();
+    for (Colour colour: Colour.values())
+      territories.put(colour, new HashSet<>());
+    
+    while (pointsToCheck.size() > 0) {
+      TablePoint point = (TablePoint)pointsToCheck.toArray()[0];
+      Set<TablePoint> pointGroup = getPointGroupFor(point);
+      pointsToCheck.removeAll(pointGroup);
+      Set<TablePoint> borderingPoints = getBorderingPoints(pointGroup);
+
+      Colour territoryColour;
+
+      try {
+        territoryColour = borderingPoints.stream()
+          .filter(borderingPoint -> borderingPoint.getStone() != null)
+          .findAny()
+          .get()
+          .getStone()
+          .colour;
+      } catch (NoSuchElementException ex) {
+        return;
+      }
+
+      if(borderingPoints.parallelStream()
+        .allMatch(borderingPoint -> borderingPoint.getStone().colour.equals(territoryColour)))
+        territories.get(territoryColour)
+          .addAll(pointGroup);
+    }
+    
+    territories.forEach((colour, points) -> {
+      points.forEach(point -> {
+        try {
+          point.putStone(new Stone(colour));
+        } catch (TablePoint.PointOccupiedException ex) {
+          throw new Error(ex);
+        }
+      });
+    });
+  }
+  
+  public void endGame() {
+    this.ended = true;
+    
+    Map<Colour, Integer> stoneCount = new HashMap<>(2);
+    
+    claimTerritories();
+    
+    table.getPoints()
+      .stream()
+      .filter(point -> point.getStone() != null)
+      .forEach(point -> {
+        Colour colour = point.getStone().colour;
+        stoneCount.put(colour, stoneCount.get(colour) + 1);
+      });
+    
+    double maxScore = 0;
+    Player winningPlayer = players[0];
+    
+    for (Player player: players) {
+      Colour colour = player.getBowl().colour;
+      double playerScore;
+      
+      if (colour.equals(Colour.WHITE))
+        playerScore = (double)stoneCount.get(colour) + komi;
+      else
+        playerScore = (double)stoneCount.get(colour);
+      
+      if (playerScore > maxScore) {
+        maxScore = playerScore;
+        winningPlayer = player;
+      }
+    }
+    
+    winner = winningPlayer;
   }
   
   private Game copy() {
@@ -237,6 +354,14 @@ implements Serializable
       throw new Error(ex);
     }
     return gameCopy;
+  }
+  
+  public Player getWinner() {
+    return winner;
+  }
+  
+  public boolean isEnded() {
+    return ended;
   }
   
 }

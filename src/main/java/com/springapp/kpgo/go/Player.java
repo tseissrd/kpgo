@@ -17,7 +17,7 @@ implements Serializable
 {
   
   protected Bowl bowl;
-  public boolean passed;
+  private boolean passed;
   
   abstract public String getName();
   abstract public boolean is(User user);
@@ -46,8 +46,16 @@ implements Serializable
     return bowl;
   }
   
+  public boolean didPass() {
+    return passed;
+  }
+  
   public void pass() {
     passed = true;
+  }
+  
+  public void resetPassed() {
+    passed = false;
   }
   
 }

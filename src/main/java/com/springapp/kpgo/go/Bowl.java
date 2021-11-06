@@ -22,7 +22,10 @@ implements Serializable
   
   public Bowl(Colour colour) {
     this.colour = colour;
-    this.stones = 50;
+    if (this.colour.equals(Colour.BLACK))
+      this.stones = 181;
+    else
+      this.stones = 180;
   }
   
   public int stonesLeft() {
@@ -30,12 +33,15 @@ implements Serializable
   }
   
   public Stone getStone()
-  throws NoStonesLeftException  
+  // throws NoStonesLeftException  
   {
     if (stonesLeft() > 0)
       return new Stone(colour);
-    else
-      throw new NoStonesLeftException();
+    else {
+      this.stones += 10;
+      return getStone();
+      // throw new NoStonesLeftException();
+    }
   }
   
 }

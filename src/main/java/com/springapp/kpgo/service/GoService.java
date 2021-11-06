@@ -99,6 +99,11 @@ public class GoService {
         Map<String, Object> playerInfo = new HashMap<>();
         playerInfo.put("username", player.getName());
         playerInfo.put("colour", player.getBowl().colour.toString());
+        playerInfo.put("you", player.is(user));
+        if (game.getWinner() == null)
+          playerInfo.put("winner", false);
+        else
+          playerInfo.put("winner", game.getWinner().equals(player));
         playersInfo.add(playerInfo);
       }
       respBody.put("players", playersInfo);
@@ -106,6 +111,7 @@ public class GoService {
       List<List<String>> jsonView = game.getTable().jsonView();
       respBody.put("table", jsonView);
       respBody.put("act", game.playerToAct().is(user));
+      respBody.put("ended", game.isEnded());
       respBody.put("status", true);
       
       return respBody;
@@ -157,6 +163,9 @@ public class GoService {
       }
       
       Game game = gameResource.getContent().read();
+      if (game.isEnded())
+        return respBody;
+      
       Player player = null;
       
       for (Player tempPlayer: game.getPlayers()) {

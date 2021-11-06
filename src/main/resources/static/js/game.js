@@ -1,6 +1,11 @@
 let gameId;
-const gameTableDock = document.getElementById('go-container');
+const gameTableDock = document.getElementById('go-game-table-container');
 let actsNext = false;
+
+const passBtn = document.getElementById('go-pass-button');
+passBtn.addEventListener('click', () => act('pass', {}));
+const gameStatusDock = document.getElementById('go-game-status');
+
 startGame();
 
 async function startGame() {
@@ -27,8 +32,21 @@ async function queryGame() {
 }
 
 async function heartbeat() {
+  updateStatus();
+  
   if (!actsNext)
     updateGameTable();
+}
+
+async function updateStatus(status) {
+  let statusText;
+  if (!status.ended) {
+    statusText = `You play with ${status.colour}.`;
+    if (actsNext)
+      statusText += " It's your turn!";
+  } else {
+    statusText = `This game has concluded. ${status.winner.name} (${status.winner.colour}) won!`;
+  }
 }
 
 function constructBackground(width, height) {
@@ -98,6 +116,33 @@ function constructGameTable(tableObject) {
 
 async function updateGameTable() {
   const state = await getState();
+  const status = {
+    ended: state.ended,
+    colour: null,
+    winner: null
+  };
+  /*
+  {
+    ended:
+    colour:
+    winner: {
+      name:
+      colour:
+    }
+  }
+   */
+  for (const player of state.players) {
+    if (player.you)
+      status.colour = player.colour;
+    
+    if (state.ended) {
+      if (player.winner) {
+        status.winner.name = player.username;
+        status.winner.colour = player.colour;
+      }
+    }
+  }
+  
   actsNext = state.act;
   const tableObject = state.table;
   while (gameTableDock.childNodes.length > 0)
