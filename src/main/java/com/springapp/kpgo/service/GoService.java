@@ -190,6 +190,7 @@ public class GoService {
         
         if (actionType.equals("pass")) {
           player.pass();
+          game.nextMove();
           resMgr.writeContent(gameResource, game);
           respBody.put("status", true);
           return respBody;

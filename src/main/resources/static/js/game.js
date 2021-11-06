@@ -3,7 +3,10 @@ const gameTableDock = document.getElementById('go-game-table-container');
 let actsNext = false;
 
 const passBtn = document.getElementById('go-pass-button');
-passBtn.addEventListener('click', () => act('pass', {}));
+passBtn.addEventListener('click', async () => {
+  await act('pass', {});
+  await updateGameTable();
+});
 const gameStatusDock = document.getElementById('go-game-status');
 
 startGame();
@@ -24,6 +27,8 @@ async function play() {
 }
 
 async function queryGame() {
+  gameStatusDock.innerText = 'LOOKING FOR A GAME';
+  
   const res = await fetch('/queue', {
     method: 'GET'
   });
@@ -32,8 +37,6 @@ async function queryGame() {
 }
 
 async function heartbeat() {
-  updateStatus();
-  
   if (!actsNext)
     updateGameTable();
 }
@@ -47,6 +50,8 @@ async function updateStatus(status) {
   } else {
     statusText = `This game has concluded. ${status.winner.name} (${status.winner.colour}) won!`;
   }
+  
+  gameStatusDock.innerText = statusText;
 }
 
 function constructBackground(width, height) {
@@ -121,6 +126,7 @@ async function updateGameTable() {
     colour: null,
     winner: null
   };
+  
   /*
   {
     ended:
@@ -144,6 +150,8 @@ async function updateGameTable() {
   }
   
   actsNext = state.act;
+  
+  updateStatus(status);
   const tableObject = state.table;
   while (gameTableDock.childNodes.length > 0)
     gameTableDock.removeChild(gameTableDock.firstChild);

@@ -130,7 +130,7 @@ implements Serializable
       if (!exclude.contains(otherPoint)) {
         if ((point.getStone() == null) && (otherPoint.getStone() == null))
           pointGroup.addAll(getPointGroupFor(otherPoint, downstreamExclude));
-        else if ((otherPoint.getStone() != null) && (otherPoint.getStone().colour.equals(point.getStone().colour))) {
+        else if ((otherPoint.getStone() != null) && (point.getStone() != null) && (otherPoint.getStone().colour.equals(point.getStone().colour))) {
           pointGroup.addAll(getPointGroupFor(otherPoint, downstreamExclude));
         }
       }
@@ -216,6 +216,7 @@ implements Serializable
     Set<TablePoint> pointsToClear = new HashSet<>();
     
     while (pointsToCheck.size() > 0) {
+      System.out.println("procTable");
       TablePoint point = (TablePoint)pointsToCheck.toArray()[0];
       Set<TablePoint> pointGroup = getPointGroupFor(point);
       pointsToCheck.removeAll(pointGroup);
@@ -267,11 +268,14 @@ implements Serializable
       territories.put(colour, new HashSet<>());
     
     while (pointsToCheck.size() > 0) {
+      System.out.println("claimTerr");
       TablePoint point = (TablePoint)pointsToCheck.toArray()[0];
       Set<TablePoint> pointGroup = getPointGroupFor(point);
       pointsToCheck.removeAll(pointGroup);
+      System.out.println("1");
       Set<TablePoint> borderingPoints = getBorderingPoints(pointGroup);
-
+      System.out.println("2");
+      
       Colour territoryColour;
 
       try {
@@ -284,11 +288,13 @@ implements Serializable
       } catch (NoSuchElementException ex) {
         return;
       }
+      System.out.println("3");
 
       if(borderingPoints.parallelStream()
         .allMatch(borderingPoint -> borderingPoint.getStone().colour.equals(territoryColour)))
         territories.get(territoryColour)
           .addAll(pointGroup);
+      System.out.println("claimTerr loop end");
     }
     
     territories.forEach((colour, points) -> {
@@ -300,6 +306,7 @@ implements Serializable
         }
       });
     });
+    System.out.println("claimTerr end");
   }
   
   public void endGame() {

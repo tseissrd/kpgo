@@ -33,7 +33,7 @@ implements Serializable
   }
   
   public Stone getStone()
-  // throws NoStonesLeftException  
+  throws NoStonesLeftException  
   {
     if (stonesLeft() > 0)
       return new Stone(colour);
