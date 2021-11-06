@@ -5,6 +5,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -75,8 +76,8 @@ implements Serializable
   
   private Set<TablePoint> getBorderingPoints(TablePoint point, Set<TablePoint> exclude) {
     Set<TablePoint> borderingPoints = new HashSet<>();
-    List<Integer> xDirections = new LinkedList();
-    List<Integer> yDirections = new LinkedList();
+    List<Integer> xDirections = new ArrayList();
+    List<Integer> yDirections = new ArrayList();
     
     if (point.x > 0)
       xDirections.add(-1);
@@ -122,20 +123,21 @@ implements Serializable
   private Set<TablePoint> getPointGroupFor(TablePoint point, Set<TablePoint> exclude) {
     Set<TablePoint> pointGroup = new HashSet<>();
     pointGroup.add(point);
+
+    exclude.add(point);
     
-    Set<TablePoint> downstreamExclude = new HashSet<>(exclude);
-    downstreamExclude.add(point);
+    Set<TablePoint> borderingPoints = getBorderingPoints(point, exclude);
     
-    for (TablePoint otherPoint: getBorderingPoints(point)) {
+    for (TablePoint otherPoint: borderingPoints) {
       if (!exclude.contains(otherPoint)) {
         if ((point.getStone() == null) && (otherPoint.getStone() == null))
-          pointGroup.addAll(getPointGroupFor(otherPoint, downstreamExclude));
+          pointGroup.addAll(getPointGroupFor(otherPoint, exclude));
         else if ((otherPoint.getStone() != null) && (point.getStone() != null) && (otherPoint.getStone().colour.equals(point.getStone().colour))) {
-          pointGroup.addAll(getPointGroupFor(otherPoint, downstreamExclude));
+          pointGroup.addAll(getPointGroupFor(otherPoint, exclude));
         }
       }
     }
-        
+    
     return pointGroup;
   }
   
@@ -216,7 +218,6 @@ implements Serializable
     Set<TablePoint> pointsToClear = new HashSet<>();
     
     while (pointsToCheck.size() > 0) {
-      System.out.println("procTable");
       TablePoint point = (TablePoint)pointsToCheck.toArray()[0];
       Set<TablePoint> pointGroup = getPointGroupFor(point);
       pointsToCheck.removeAll(pointGroup);
@@ -268,13 +269,10 @@ implements Serializable
       territories.put(colour, new HashSet<>());
     
     while (pointsToCheck.size() > 0) {
-      System.out.println("claimTerr");
       TablePoint point = (TablePoint)pointsToCheck.toArray()[0];
       Set<TablePoint> pointGroup = getPointGroupFor(point);
       pointsToCheck.removeAll(pointGroup);
-      System.out.println("1");
       Set<TablePoint> borderingPoints = getBorderingPoints(pointGroup);
-      System.out.println("2");
       
       Colour territoryColour;
 
@@ -288,13 +286,11 @@ implements Serializable
       } catch (NoSuchElementException ex) {
         return;
       }
-      System.out.println("3");
 
       if(borderingPoints.parallelStream()
         .allMatch(borderingPoint -> borderingPoint.getStone().colour.equals(territoryColour)))
         territories.get(territoryColour)
           .addAll(pointGroup);
-      System.out.println("claimTerr loop end");
     }
     
     territories.forEach((colour, points) -> {
@@ -306,13 +302,14 @@ implements Serializable
         }
       });
     });
-    System.out.println("claimTerr end");
   }
   
   public void endGame() {
     this.ended = true;
     
     Map<Colour, Integer> stoneCount = new HashMap<>(2);
+    for (Colour colour: Colour.values())
+      stoneCount.put(colour, 0);
     
     claimTerritories();
     

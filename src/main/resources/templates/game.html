@@ -5,12 +5,16 @@
   </head>
   
   <body>
+    <div class="go-game-background"></div>
+    
     <div id="go-game-container" class="go-game-container">
-      <div id="go-game-status" class="go-game-status"></div>
-      <div id="go-game-table-container" class="go-game-table-container"></div>
-      <div id="go-game-menu" class="go-game-menu">
-        <button id="go-pass-button" class="go-pass-button">PASS</button>
+      <div class="go-game-header">
+        <div id="go-game-status" class="go-game-status float-left"></div>
+        <div id="go-game-menu" class="go-game-menu float-left">
+          <button id="go-pass-button" class="go-pass-button" hidden>PASS</button>
+        </div>
       </div>
+      <div id="go-game-table-container" class="go-game-table-container"></div>
     </div>
     
     <script src="/js/game.js"></script>

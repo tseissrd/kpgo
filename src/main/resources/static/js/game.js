@@ -3,6 +3,7 @@ const gameTableDock = document.getElementById('go-game-table-container');
 let actsNext = false;
 
 const passBtn = document.getElementById('go-pass-button');
+passBtn.hidden = true;
 passBtn.addEventListener('click', async () => {
   await act('pass', {});
   await updateGameTable();
@@ -48,7 +49,7 @@ async function updateStatus(status) {
     if (actsNext)
       statusText += " It's your turn!";
   } else {
-    statusText = `This game has concluded. ${status.winner.name} (${status.winner.colour}) won!`;
+    statusText = `This game has concluded. ${status.winner.name} (${status.winner.colour}) has won!`;
   }
   
   gameStatusDock.innerText = statusText;
@@ -124,7 +125,7 @@ async function updateGameTable() {
   const status = {
     ended: state.ended,
     colour: null,
-    winner: null
+    winner: {}
   };
   
   /*
@@ -152,6 +153,11 @@ async function updateGameTable() {
   actsNext = state.act;
   
   updateStatus(status);
+  if (actsNext)
+    passBtn.hidden = false;
+  else
+    passBtn.hidden = true;
+  
   const tableObject = state.table;
   while (gameTableDock.childNodes.length > 0)
     gameTableDock.removeChild(gameTableDock.firstChild);

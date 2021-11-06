@@ -29,7 +29,6 @@ public class GameQueueService {
     @Autowired
     private QueueManager qMgr;
     
-    @Transactional
     @RequestMapping("/queue")
     public @ResponseBody Map<String, Object> queueEndpoint(HttpServletRequest request, HttpServletResponse response) {
       User user = authMgr.authorize(request.getCookies());
