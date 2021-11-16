@@ -153,7 +153,7 @@ async function updateGameTable() {
   actsNext = state.act;
   
   updateStatus(status);
-  if (actsNext)
+  if (actsNext && (!state.ended))
     passBtn.hidden = false;
   else
     passBtn.hidden = true;

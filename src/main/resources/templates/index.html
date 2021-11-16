@@ -1,19 +1,15 @@
 <html>
 	<head>
       <title>Landing</title>
+      <link rel="stylesheet" href="/css/main.css"/>
 	</head>
 	<body>
+      <div class="go-game-background"></div>
       
-      <div>
-        This is index page, test variable is: <th:block th:utext="${test}"/>
-      </div>
-      
-      <div>
-        <div class="game-finder-container">
-          <button id="find-game-btn" class="find-game-btn">play</button>
-          <div class="find-game-timer"></div>
+      <div class="game-finder-container">
+        <div class="game-finder-button">
+          <a href="/play"><button class="game-finder-button">play</button></a>
         </div>
-        <a href="/play">play now</a>
       </div>
       
       <script src="/js/index.js"></script>

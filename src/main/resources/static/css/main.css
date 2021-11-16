@@ -13,6 +13,7 @@ div {
 }
 
 .login {
+  background-color: lightsteelblue;
   text-align: center;
   top: 30%;
 }
@@ -25,7 +26,7 @@ div {
 
 .form-fields-with-actions {
   width: 250px;
-  height: 70px;
+  height: 80px;
   margin-left: auto;
   margin-right: auto;
 }
@@ -73,6 +74,7 @@ div {
   height: 17px;
   float: left;
   margin-left: 13px;
+  background-color: lightsteelblue;
 }
 
 #signup-container {
@@ -81,6 +83,24 @@ div {
 
 .float-left {
   float: left;
+}
+
+.game-finder-container {
+  background-color: lightsteelblue;
+  width: 100px;
+  height: 70px;
+  margin-left: auto;
+  margin-right: auto;
+  top: 40%;
+}
+
+.game-finder-button {
+  width: 60px;
+  height: 30px;
+  margin-left: auto;
+  margin-right: auto;
+  font-weight: bold;
+  top: 20px;
 }
 
 .go-game-background {
@@ -101,7 +121,8 @@ div {
 }
 
 .go-game-header {
-  height: 30px
+  height: 30px;
+  background-color: lightsteelblue;
 }
 
 .go-game-status {
